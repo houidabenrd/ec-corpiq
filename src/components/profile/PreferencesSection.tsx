@@ -1,75 +1,73 @@
-import { Settings, FileText, Save } from 'lucide-react';
+import { useState } from 'react';
+import { Save } from 'lucide-react';
 import { Card, CardHeader } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { StatusBanner } from '../ui/StatusBanner';
 
 export function PreferencesSection() {
+  const [saved, setSaved] = useState(false);
+
+  const preferences = [
+    { id: 'comm', label: 'Communications CORPIQ', desc: 'Recevoir les communications officielles de CORPIQ', checked: true },
+    { id: 'newsletter', label: 'Infolettre', desc: 'Recevoir l\'infolettre périodique', checked: true },
+    { id: 'partners', label: 'Partenaires', desc: 'Recevoir les offres de nos partenaires', checked: false },
+    { id: 'admin', label: 'Notifications administratives', desc: 'Recevoir les notifications liées à votre compte', checked: true },
+  ];
+
+  function handleSave() {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  }
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader
-          title="Préférences Loi 25"
-          subtitle="Gestion de vos préférences de confidentialité"
-          badge={<Badge variant="purple"><Settings size={12} /> Loi 25</Badge>}
+          title="Préférences de communication"
+          subtitle="Synchronisées avec Mailchimp via le backend"
+          badge={<Badge variant="purple">Loi 25</Badge>}
         />
 
-        <div className="space-y-4">
-          <label className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
-            <input
-              type="checkbox"
-              defaultChecked
-              className="mt-0.5 rounded border-gray-300 text-corpiq-blue focus:ring-corpiq-blue"
-            />
-            <div>
-              <p className="text-sm font-medium text-gray-900">Communications marketing</p>
-              <p className="text-xs text-gray-500 mt-1">
-                J'accepte de recevoir des communications marketing et promotionnelles de CORPIQ
-              </p>
-            </div>
-          </label>
+        {saved && (
+          <StatusBanner variant="success" message="Vos informations ont été mises à jour." className="mb-5" />
+        )}
 
-          <label className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
-            <input
-              type="checkbox"
-              defaultChecked
-              className="mt-0.5 rounded border-gray-300 text-corpiq-blue focus:ring-corpiq-blue"
-            />
-            <div>
-              <p className="text-sm font-medium text-gray-900">Notifications par courriel</p>
-              <p className="text-xs text-gray-500 mt-1">
-                Recevoir des notifications par courriel concernant mes services et mon compte
-              </p>
-            </div>
-          </label>
+        <div className="space-y-3">
+          {preferences.map((pref) => (
+            <label
+              key={pref.id}
+              className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors"
+            >
+              <input
+                type="checkbox"
+                defaultChecked={pref.checked}
+                className="mt-0.5 rounded border-gray-300 text-corpiq-blue focus:ring-corpiq-blue"
+              />
+              <div>
+                <p className="text-sm font-medium text-gray-900">{pref.label}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{pref.desc}</p>
+              </div>
+            </label>
+          ))}
+        </div>
 
-          <label className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
-            <input
-              type="checkbox"
-              className="mt-0.5 rounded border-gray-300 text-corpiq-blue focus:ring-corpiq-blue"
-            />
-            <div>
-              <p className="text-sm font-medium text-gray-900">Partage avec partenaires</p>
-              <p className="text-xs text-gray-500 mt-1">
-                J'accepte le partage de mes données avec les partenaires sélectionnés de CORPIQ
-              </p>
-            </div>
-          </label>
+        <p className="text-[11px] text-gray-400 mt-4">
+          Le front gère : affichage, édition, sauvegarde. La synchronisation avec Mailchimp est gérée par le backend.
+        </p>
 
-          <div className="flex justify-end pt-2">
-            <Button icon={<Save size={16} />}>
-              Enregistrer mes préférences
-            </Button>
-          </div>
+        <div className="flex justify-end pt-4">
+          <Button icon={<Save size={16} />} onClick={handleSave}>
+            Enregistrer mes préférences
+          </Button>
         </div>
       </Card>
 
       <Card>
         <CardHeader
           title="Conditions générales d'utilisation"
-          subtitle="Version acceptée de vos CGU"
-          badge={<Badge variant="success"><FileText size={12} /> Acceptées</Badge>}
+          badge={<Badge variant="success">Acceptées</Badge>}
         />
-
         <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
           <div className="grid grid-cols-2 gap-4">
             <div>

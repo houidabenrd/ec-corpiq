@@ -9,18 +9,13 @@ import { BillingSection } from './BillingSection';
 import { StatusBanner } from '../ui/StatusBanner';
 import type { MembershipState } from '../../types';
 
-function getMembershipBadge(state: MembershipState) {
+function getStateBadge(state: MembershipState) {
   switch (state) {
-    case 'MEMBER_ACTIVE':
-      return <Badge variant="success" dot>Membre actif</Badge>;
-    case 'MEMBER_IN_PROGRESS':
-      return <Badge variant="warning" dot>Renouvellement en cours</Badge>;
-    case 'MEMBER_EXPIRED':
-      return <Badge variant="danger" dot>Adhésion expirée</Badge>;
-    case 'MEMBER_GRACE_PERIOD':
-      return <Badge variant="danger" dot>Période de grâce</Badge>;
-    default:
-      return <Badge variant="neutral">Non-membre</Badge>;
+    case 'MEMBER_ACTIVE': return <Badge variant="success" dot>Membre actif</Badge>;
+    case 'MEMBER_IN_PROGRESS': return <Badge variant="warning" dot>Renouvellement en cours</Badge>;
+    case 'MEMBER_EXPIRED': return <Badge variant="danger" dot>Expiré</Badge>;
+    case 'MEMBER_GRACE_PERIOD': return <Badge variant="danger" dot>Période de grâce</Badge>;
+    default: return <Badge variant="neutral">Non-membre</Badge>;
   }
 }
 
@@ -46,20 +41,18 @@ export function ProfilePage() {
         >
           <ArrowLeft size={20} />
         </button>
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-corpiq-blue-50 rounded-full flex items-center justify-center">
-              <UserCircle size={28} className="text-corpiq-blue" />
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-corpiq-blue-50 rounded-full flex items-center justify-center">
+            <UserCircle size={28} className="text-corpiq-blue" />
+          </div>
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-gray-900">Mon profil</h1>
+              {getStateBadge(scenario.membership_state)}
             </div>
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-gray-900">Mon profil</h1>
-                {getMembershipBadge(scenario.membership_state)}
-              </div>
-              <p className="text-sm text-gray-500">
-                {getRoleName(scenario.membership_state, scenario.is_primary_member)} — Jean Tremblay
-              </p>
-            </div>
+            <p className="text-sm text-gray-500">
+              {getRoleName(scenario.membership_state, scenario.is_primary_member)} — Jean Tremblay
+            </p>
           </div>
         </div>
       </div>
@@ -68,7 +61,7 @@ export function ProfilePage() {
         <StatusBanner
           variant="error"
           title={scenario.membership_state === 'MEMBER_GRACE_PERIOD' ? 'Période de grâce' : 'Adhésion expirée'}
-          message="Votre adhésion est expirée. Renouvelez pour retrouver l'accès complet à tous les services."
+          message="Votre adhésion est expirée. Renouvelez pour retrouver l'accès complet."
           className="mb-6"
         />
       )}
@@ -120,8 +113,16 @@ export function ProfilePage() {
         {!showBilling && scenario.has_organization && !scenario.is_primary_member && (
           <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-center">
             <p className="text-sm text-gray-500">
-              La section informations bancaires n'est pas disponible pour les délégués.
+              Section informations bancaires masquée pour les délégués.
               Seul le membre principal peut gérer les cartes de paiement.
+            </p>
+          </div>
+        )}
+
+        {!showBilling && !scenario.has_organization && (
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-center">
+            <p className="text-sm text-gray-500">
+              Section informations bancaires masquée pour les non-membres.
             </p>
           </div>
         )}

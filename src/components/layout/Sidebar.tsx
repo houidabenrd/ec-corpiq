@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -8,7 +9,13 @@ import {
   Calendar,
   Headphones,
   ChevronRight,
+  ChevronDown,
   Lock,
+  Percent,
+  Calculator,
+  FileText,
+  MonitorSmartphone,
+  Scale,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useScenario } from '../../context/ScenarioContext';
@@ -16,14 +23,23 @@ import { Badge } from '../ui/Badge';
 import type { MembershipState } from '../../types';
 
 type ItemState = 'visible' | 'grayed' | 'hidden';
+type StateMap = Record<'nonMember' | 'active' | 'delegate' | 'inProgress' | 'expired', ItemState>;
+
+interface SubItem {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  path: string;
+}
 
 interface NavItem {
   id: string;
   label: string;
   icon: React.ReactNode;
   path: string;
-  states: Record<'nonMember' | 'active' | 'delegate' | 'inProgress' | 'expired', ItemState>;
+  states: StateMap;
   badge?: (state: MembershipState) => React.ReactNode | null;
+  children?: SubItem[];
 }
 
 const navItems: NavItem[] = [
@@ -70,6 +86,11 @@ const navItems: NavItem[] = [
     icon: <Star size={20} />,
     path: '/avantages',
     states: { nonMember: 'hidden', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'hidden' },
+    children: [
+      { id: 'rabais', label: 'Rabais partenaire', icon: <Percent size={16} />, path: '/avantages/rabais' },
+      { id: 'calculateur', label: 'Calculateur de loyer', icon: <Calculator size={16} />, path: '/avantages/calculateur' },
+      { id: 'modeles', label: 'Modèles de lettre et formulaire', icon: <FileText size={16} />, path: '/avantages/modeles' },
+    ],
   },
   {
     id: 'evenements',
@@ -85,10 +106,14 @@ const navItems: NavItem[] = [
     icon: <Headphones size={20} />,
     path: '/support',
     states: { nonMember: 'visible', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'visible' },
+    children: [
+      { id: 'support-technique', label: 'Support technique', icon: <MonitorSmartphone size={16} />, path: '/support/technique' },
+      { id: 'support-juridique', label: 'Support juridique', icon: <Scale size={16} />, path: '/support/juridique' },
+    ],
   },
 ];
 
-function getStateKey(membership: MembershipState, isPrimary: boolean): keyof NavItem['states'] {
+function getStateKey(membership: MembershipState, isPrimary: boolean): keyof StateMap {
   if (membership === 'NON_MEMBER') return 'nonMember';
   if (membership === 'MEMBER_EXPIRED' || membership === 'MEMBER_GRACE_PERIOD') return 'expired';
   if (membership === 'MEMBER_IN_PROGRESS') return 'inProgress';
@@ -110,9 +135,28 @@ export function Sidebar({ mobile = false, onClose }: SidebarProps) {
   const isExpired = scenario.membership_state === 'MEMBER_EXPIRED' || scenario.membership_state === 'MEMBER_GRACE_PERIOD';
   const isNonMember = scenario.membership_state === 'NON_MEMBER';
 
+  const initialOpen: string[] = [];
+  for (const item of navItems) {
+    if (item.children?.some((c) => location.pathname === c.path)) {
+      initialOpen.push(item.id);
+    }
+  }
+
+  const [openSections, setOpenSections] = useState<string[]>(initialOpen);
+
+  function toggleSection(id: string) {
+    setOpenSections((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+    );
+  }
+
   function handleNav(path: string) {
     navigate(path);
     onClose?.();
+  }
+
+  function isChildActive(item: NavItem) {
+    return item.children?.some((c) => location.pathname === c.path) ?? false;
   }
 
   return (
@@ -166,37 +210,86 @@ export function Sidebar({ mobile = false, onClose }: SidebarProps) {
           const state = item.states[stateKey];
           if (state === 'hidden') return null;
 
-          const isActive = location.pathname === item.path;
+          const hasChildren = item.children && item.children.length > 0;
+          const isOpen = openSections.includes(item.id);
+          const isActive = location.pathname === item.path && !hasChildren;
+          const isParentActive = hasChildren && isChildActive(item);
           const isGrayed = state === 'grayed';
           const badge = item.badge?.(scenario.membership_state);
 
           return (
-            <button
-              key={item.id}
-              onClick={() => !isGrayed && handleNav(item.path)}
-              className={clsx(
-                'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 group relative',
-                isActive && !isGrayed && 'bg-corpiq-blue text-white shadow-sm',
-                !isActive && !isGrayed && 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100',
-                isGrayed && 'text-gray-400 cursor-not-allowed opacity-50',
+            <div key={item.id}>
+              <button
+                onClick={() => {
+                  if (isGrayed) return;
+                  if (hasChildren) {
+                    toggleSection(item.id);
+                  } else {
+                    handleNav(item.path);
+                  }
+                }}
+                className={clsx(
+                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 group relative',
+                  (isActive || isParentActive) && !isGrayed && 'bg-corpiq-blue text-white shadow-sm',
+                  !(isActive || isParentActive) && !isGrayed && 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100',
+                  isGrayed && 'text-gray-400 cursor-not-allowed opacity-50',
+                )}
+              >
+                {(isActive || isParentActive) && !isGrayed && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white/40 rounded-r-full" />
+                )}
+                <span className={clsx(
+                  'flex-shrink-0 transition-colors duration-200',
+                  (isActive || isParentActive) && !isGrayed ? 'text-white' : isGrayed ? 'text-gray-300' : 'text-gray-400 group-hover:text-corpiq-blue'
+                )}>
+                  {item.icon}
+                </span>
+                <span className="flex-1 text-left font-medium">{item.label}</span>
+                {isGrayed && <Lock size={12} className="text-gray-300" />}
+                {badge && !isGrayed && !hasChildren && <span className="flex-shrink-0">{badge}</span>}
+                {hasChildren && !isGrayed && (
+                  <ChevronDown
+                    size={14}
+                    className={clsx(
+                      'flex-shrink-0 transition-transform duration-200',
+                      (isActive || isParentActive) ? 'text-white/60' : 'text-gray-400',
+                      isOpen && 'rotate-180'
+                    )}
+                  />
+                )}
+                {!badge && !isGrayed && !hasChildren && !isActive && (
+                  <ChevronRight size={14} className="flex-shrink-0 text-gray-300 opacity-0 group-hover:opacity-100 translate-x-[-4px] group-hover:translate-x-0 transition-all duration-200" />
+                )}
+              </button>
+
+              {hasChildren && isOpen && !isGrayed && (
+                <div className="ml-4 pl-3 border-l-2 border-gray-100 mt-0.5 mb-1 space-y-0.5 animate-fade-in">
+                  {item.children!.map((child) => {
+                    const isChildItemActive = location.pathname === child.path;
+                    return (
+                      <button
+                        key={child.id}
+                        onClick={() => handleNav(child.path)}
+                        className={clsx(
+                          'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all duration-200 group',
+                          isChildItemActive
+                            ? 'bg-corpiq-blue-50 text-corpiq-blue font-medium'
+                            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800'
+                        )}
+                      >
+                        <span className={clsx(
+                          'flex-shrink-0 transition-colors',
+                          isChildItemActive ? 'text-corpiq-blue' : 'text-gray-400 group-hover:text-gray-600'
+                        )}>
+                          {child.icon}
+                        </span>
+                        <span className="flex-1 text-left">{child.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               )}
-            >
-              {isActive && !isGrayed && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white/40 rounded-r-full" />
-              )}
-              <span className={clsx(
-                'flex-shrink-0 transition-colors duration-200',
-                isActive && !isGrayed ? 'text-white' : isGrayed ? 'text-gray-300' : 'text-gray-400 group-hover:text-corpiq-blue'
-              )}>
-                {item.icon}
-              </span>
-              <span className="flex-1 text-left font-medium">{item.label}</span>
-              {isGrayed && <Lock size={12} className="text-gray-300" />}
-              {badge && !isGrayed && <span className="flex-shrink-0">{badge}</span>}
-              {!badge && !isGrayed && !isActive && (
-                <ChevronRight size={14} className="flex-shrink-0 text-gray-300 opacity-0 group-hover:opacity-100 translate-x-[-4px] group-hover:translate-x-0 transition-all duration-200" />
-              )}
-            </button>
+            </div>
           );
         })}
       </nav>

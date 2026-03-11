@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Crown, Receipt, Wrench, Star, Calendar, Headphones } from 'lucide-react';
+import { Crown, Receipt, Wrench, Star, Calendar, Headphones, Percent, Calculator, FileText, MonitorSmartphone, Scale } from 'lucide-react';
 import { ScenarioProvider } from './context/ScenarioContext';
 import { ScenarioSwitcher } from './components/ScenarioSwitcher';
 import { LoginPage } from './components/auth/LoginPage';
@@ -36,8 +36,13 @@ export default function App() {
             <Route path="/factures" element={<PlaceholderPage title="Mes factures" icon={<Receipt size={28} />} />} />
             <Route path="/outils" element={<PlaceholderPage title="Mes outils" icon={<Wrench size={28} />} />} />
             <Route path="/avantages" element={<PlaceholderPage title="Avantages" icon={<Star size={28} />} />} />
+            <Route path="/avantages/rabais" element={<PlaceholderPage title="Rabais partenaire" icon={<Percent size={28} />} />} />
+            <Route path="/avantages/calculateur" element={<PlaceholderPage title="Calculateur d'augmentation de loyer" icon={<Calculator size={28} />} />} />
+            <Route path="/avantages/modeles" element={<PlaceholderPage title="Modèles de lettre et formulaire" icon={<FileText size={28} />} />} />
             <Route path="/evenements" element={<PlaceholderPage title="Événements & formations" icon={<Calendar size={28} />} />} />
             <Route path="/support" element={<PlaceholderPage title="Support" icon={<Headphones size={28} />} />} />
+            <Route path="/support/technique" element={<PlaceholderPage title="Support technique" icon={<MonitorSmartphone size={28} />} />} />
+            <Route path="/support/juridique" element={<PlaceholderPage title="Support juridique" icon={<Scale size={28} />} />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Routes>

@@ -1,6 +1,5 @@
 # Netlify configuration for ec-corpiq
 [build]
-  base = "apps/ec-corpiq"
   command = "pnpm build"
   publish = "dist"
 

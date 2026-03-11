@@ -24,13 +24,18 @@ export function Header({ onToggleMobileMenu, mobileMenuOpen }: HeaderProps) {
     navigate('/auth/login');
   }
 
+  function navTo(path: string) {
+    setAvatarOpen(false);
+    navigate(path);
+  }
+
   return (
     <header className="bg-white border-b border-gray-200 h-14 flex items-center px-4 lg:px-6 sticky top-10 z-30">
       <div className="flex items-center gap-3 flex-shrink-0">
         {isInsideApp && (
           <button
             onClick={onToggleMobileMenu}
-            className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+            className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 active:bg-gray-200 transition-colors"
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -38,9 +43,9 @@ export function Header({ onToggleMobileMenu, mobileMenuOpen }: HeaderProps) {
 
         <button
           onClick={() => isInsideApp ? navigate('/dashboard') : navigate('/')}
-          className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2.5 hover:opacity-80 active:opacity-70 transition-opacity"
         >
-          <div className="w-8 h-8 bg-corpiq-blue rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-corpiq-blue rounded-lg flex items-center justify-center shadow-sm">
             <Building2 size={18} className="text-white" />
           </div>
           <span className="font-bold text-corpiq-blue hidden sm:block">EC CORPIQ</span>
@@ -49,46 +54,55 @@ export function Header({ onToggleMobileMenu, mobileMenuOpen }: HeaderProps) {
 
       <div className="flex-1" />
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <button
           onClick={() => setLang(lang === 'FR' ? 'EN' : 'FR')}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+          className={clsx(
+            'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+            'text-gray-500 hover:text-gray-700 hover:bg-gray-100 active:bg-gray-200'
+          )}
         >
-          <Globe size={16} />
-          <span>{lang}</span>
+          <Globe size={15} />
+          <span className="min-w-[20px] text-center">{lang}</span>
         </button>
 
         {isInsideApp && (
-          <div className="relative">
+          <div className="relative ml-1">
             <button
               onClick={() => setAvatarOpen(!avatarOpen)}
-              className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              className={clsx(
+                'flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all',
+                avatarOpen ? 'bg-gray-100' : 'hover:bg-gray-100 active:bg-gray-200'
+              )}
             >
-              <div className="w-8 h-8 bg-corpiq-blue-50 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-corpiq-blue-50 to-corpiq-blue-100 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm">
                 <UserCircle size={20} className="text-corpiq-blue" />
               </div>
               <span className="text-sm font-medium text-gray-700 hidden sm:block">Jean T.</span>
-              <ChevronDown size={14} className={clsx('text-gray-400 transition-transform', avatarOpen && 'rotate-180')} />
+              <ChevronDown size={14} className={clsx('text-gray-400 transition-transform duration-200', avatarOpen && 'rotate-180')} />
             </button>
 
             {avatarOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setAvatarOpen(false)} />
-                <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50 animate-fade-in">
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900">Jean Tremblay</p>
-                    <p className="text-xs text-gray-400">jean.tremblay@email.com</p>
+                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50 animate-fade-in">
+                  <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
+                    <p className="text-sm font-semibold text-gray-900">Jean Tremblay</p>
+                    <p className="text-xs text-gray-400 mt-0.5">jean.tremblay@email.com</p>
                   </div>
                   <div className="py-1">
                     <button
-                      onClick={() => { setAvatarOpen(false); navigate('/profile'); }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => navTo('/profile')}
+                      className={clsx(
+                        'w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors',
+                        location.pathname === '/profile' ? 'text-corpiq-blue bg-corpiq-blue-50' : 'text-gray-700 hover:bg-gray-50'
+                      )}
                     >
-                      <UserCircle size={16} className="text-gray-400" />
+                      <UserCircle size={16} className={location.pathname === '/profile' ? 'text-corpiq-blue' : 'text-gray-400'} />
                       Profil
                     </button>
                     <button
-                      onClick={() => { setAvatarOpen(false); navigate('/profile'); }}
+                      onClick={() => navTo('/profile')}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       <Settings size={16} className="text-gray-400" />

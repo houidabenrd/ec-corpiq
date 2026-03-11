@@ -17,50 +17,30 @@ export function RegisterPage() {
 
   function handleRegister(e: React.FormEvent) {
     e.preventDefault();
-
     if (isMember && !cardNumber.trim()) {
       setCardError('Le numéro de carte membre est requis');
       return;
     }
-
     if (isMember) {
       setStep('validating');
-      setTimeout(() => {
-        setStep('done');
-        navigate('/auth/verify-email');
-      }, 1500);
+      setTimeout(() => { setStep('done'); navigate('/auth/verify-email'); }, 1500);
     } else {
       navigate('/auth/verify-email');
     }
   }
 
   return (
-    <AuthLayout
-      title="Créer un compte"
-      subtitle="Rejoignez l'espace client CORPIQ"
-    >
+    <AuthLayout title="Créer un compte" subtitle="Rejoignez l'espace client CORPIQ">
       {step === 'validating' && (
-        <div className="mb-6">
-          <StatusBanner
-            variant="info"
-            message="Validation de votre carte membre en cours via AMS..."
-          />
+        <div className="mb-6 animate-fade-in">
+          <StatusBanner variant="info" message="Validation de votre carte membre en cours via AMS..." />
         </div>
       )}
 
       <form onSubmit={handleRegister} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Prénom"
-            placeholder="Jean"
-            icon={<User size={18} />}
-            required
-          />
-          <Input
-            label="Nom"
-            placeholder="Tremblay"
-            required
-          />
+          <Input label="Prénom" placeholder="Jean" icon={<User size={18} />} required />
+          <Input label="Nom" placeholder="Tremblay" required />
         </div>
 
         <Input
@@ -71,23 +51,23 @@ export function RegisterPage() {
           required
         />
 
-        <div className="relative">
-          <Input
-            label="Mot de passe"
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Minimum 8 caractères"
-            icon={<Lock size={18} />}
-            required
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
-            style={{ position: 'relative', float: 'right', marginTop: '-36px', marginRight: '8px' }}
-          >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        </div>
+        <Input
+          label="Mot de passe"
+          type={showPassword ? 'text' : 'password'}
+          placeholder="Minimum 8 caractères"
+          icon={<Lock size={18} />}
+          trailing={
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="text-gray-400 hover:text-gray-600 transition-colors p-0.5"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          }
+          required
+        />
 
         <div className="pt-2">
           <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -99,8 +79,8 @@ export function RegisterPage() {
               onClick={() => { setIsMember(true); setCardError(''); }}
               className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
                 isMember === true
-                  ? 'border-corpiq-blue bg-corpiq-blue-50 text-corpiq-blue'
-                  : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                  ? 'border-corpiq-blue bg-corpiq-blue-50 text-corpiq-blue shadow-input-focus'
+                  : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
               Oui, je suis membre
@@ -110,8 +90,8 @@ export function RegisterPage() {
               onClick={() => { setIsMember(false); setCardError(''); setCardNumber(''); }}
               className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
                 isMember === false
-                  ? 'border-corpiq-blue bg-corpiq-blue-50 text-corpiq-blue'
-                  : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                  ? 'border-corpiq-blue bg-corpiq-blue-50 text-corpiq-blue shadow-input-focus'
+                  : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
               Non, pas encore
@@ -135,10 +115,7 @@ export function RegisterPage() {
 
         {isMember === false && (
           <div className="animate-fade-in">
-            <StatusBanner
-              variant="info"
-              message="Vous pourrez découvrir nos services et adhérer à tout moment depuis votre espace."
-            />
+            <StatusBanner variant="info" message="Vous pourrez découvrir nos services et adhérer à tout moment depuis votre espace." />
           </div>
         )}
 
@@ -149,7 +126,7 @@ export function RegisterPage() {
         </div>
       </form>
 
-      <div className="relative my-6">
+      <div className="relative my-8">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-200" />
         </div>
@@ -164,7 +141,7 @@ export function RegisterPage() {
         Déjà un compte ?{' '}
         <button
           onClick={() => navigate('/auth/login')}
-          className="font-medium text-corpiq-accent hover:text-corpiq-accent-light transition-colors"
+          className="font-medium text-corpiq-accent hover:text-corpiq-accent-light hover:underline underline-offset-2 transition-all"
         >
           Se connecter
         </button>

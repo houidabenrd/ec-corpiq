@@ -28,22 +28,12 @@ function MicrosoftIcon() {
 
 export function SSOButtons({ onSuccess }: SSOButtonsProps) {
   return (
-    <div className="space-y-3">
-      <Button
-        variant="google"
-        fullWidth
-        icon={<GoogleIcon />}
-        onClick={onSuccess}
-      >
-        Continuer avec Google
+    <div className="grid grid-cols-2 gap-3">
+      <Button variant="google" fullWidth icon={<GoogleIcon />} onClick={onSuccess}>
+        Google
       </Button>
-      <Button
-        variant="microsoft"
-        fullWidth
-        icon={<MicrosoftIcon />}
-        onClick={onSuccess}
-      >
-        Continuer avec Microsoft
+      <Button variant="microsoft" fullWidth icon={<MicrosoftIcon />} onClick={onSuccess}>
+        Microsoft
       </Button>
     </div>
   );

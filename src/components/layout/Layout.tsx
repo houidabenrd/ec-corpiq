@@ -1,26 +1,30 @@
-import { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { useScenario } from '../../context/ScenarioContext';
 import { Ban, Headphones } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { clsx } from 'clsx';
 
 export function Layout() {
   const { scenario } = useScenario();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   if (!scenario.user_active) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header onToggleMobileMenu={() => {}} mobileMenuOpen={false} />
         <div className="flex-1 bg-gray-50 flex items-center justify-center p-6">
-          <div className="bg-white rounded-2xl shadow-soft p-8 max-w-md w-full text-center space-y-6">
+          <div className="bg-white rounded-2xl shadow-soft p-8 max-w-md w-full text-center space-y-6 animate-fade-in-up">
             <div className="w-20 h-20 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center">
-              <Ban size={36} className="text-gray-500" />
+              <Ban size={36} className="text-gray-400" />
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">Compte désactivé</h2>
@@ -46,8 +50,11 @@ export function Layout() {
 
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-40 top-24">
-          <div className="absolute inset-0 bg-black/30" onClick={() => setMobileMenuOpen(false)} />
-          <div className="relative w-72 h-full bg-white animate-slide-in-left">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-[2px] animate-fade-in"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="relative w-72 h-full bg-white shadow-xl animate-slide-in-left">
             <Sidebar mobile onClose={() => setMobileMenuOpen(false)} />
           </div>
         </div>

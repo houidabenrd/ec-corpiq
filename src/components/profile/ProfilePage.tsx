@@ -7,8 +7,9 @@ import { SecuritySection } from './SecuritySection';
 import { PreferencesSection } from './PreferencesSection';
 import { BillingSection } from './BillingSection';
 import { StatusBanner } from '../ui/StatusBanner';
+import type { MembershipState } from '../../types';
 
-function getMembershipBadge(state: string) {
+function getMembershipBadge(state: MembershipState) {
   switch (state) {
     case 'MEMBER_ACTIVE':
       return <Badge variant="success" dot>Membre actif</Badge>;
@@ -23,11 +24,18 @@ function getMembershipBadge(state: string) {
   }
 }
 
+function getRoleName(state: MembershipState, isPrimary: boolean) {
+  if (state === 'NON_MEMBER') return 'Non-membre';
+  if (!isPrimary) return 'Délégué';
+  return 'Membre principal';
+}
+
 export function ProfilePage() {
   const navigate = useNavigate();
   const { scenario } = useScenario();
 
   const showBilling = scenario.billing_available && scenario.is_primary_member;
+  const isExpired = scenario.membership_state === 'MEMBER_EXPIRED' || scenario.membership_state === 'MEMBER_GRACE_PERIOD';
 
   return (
     <div className="max-w-4xl mx-auto p-6 lg:p-8 animate-fade-in">
@@ -49,21 +57,29 @@ export function ProfilePage() {
                 {getMembershipBadge(scenario.membership_state)}
               </div>
               <p className="text-sm text-gray-500">
-                {scenario.is_primary_member ? 'Membre principal' : scenario.has_organization ? 'Délégué' : 'Utilisateur'} — Jean Tremblay
+                {getRoleName(scenario.membership_state, scenario.is_primary_member)} — Jean Tremblay
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {(scenario.membership_state === 'MEMBER_EXPIRED' || scenario.membership_state === 'MEMBER_GRACE_PERIOD') && (
-        <div className="mb-6">
-          <StatusBanner
-            variant="error"
-            title={scenario.membership_state === 'MEMBER_GRACE_PERIOD' ? 'Période de grâce' : 'Adhésion expirée'}
-            message="Votre adhésion est expirée. Veuillez renouveler pour retrouver l'accès complet à tous les services."
-          />
-        </div>
+      {isExpired && (
+        <StatusBanner
+          variant="error"
+          title={scenario.membership_state === 'MEMBER_GRACE_PERIOD' ? 'Période de grâce' : 'Adhésion expirée'}
+          message="Votre adhésion est expirée. Renouvelez pour retrouver l'accès complet à tous les services."
+          className="mb-6"
+        />
+      )}
+
+      {scenario.membership_state === 'MEMBER_IN_PROGRESS' && (
+        <StatusBanner
+          variant="warning"
+          title="Renouvellement en cours"
+          message="Votre renouvellement est en traitement. Accès complet maintenu."
+          className="mb-6"
+        />
       )}
 
       <div className="space-y-8">
@@ -99,6 +115,15 @@ export function ProfilePage() {
             </h2>
             <BillingSection />
           </section>
+        )}
+
+        {!showBilling && scenario.has_organization && !scenario.is_primary_member && (
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-center">
+            <p className="text-sm text-gray-500">
+              La section informations bancaires n'est pas disponible pour les délégués.
+              Seul le membre principal peut gérer les cartes de paiement.
+            </p>
+          </div>
         )}
       </div>
     </div>

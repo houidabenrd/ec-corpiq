@@ -8,7 +8,7 @@ interface AuthLayoutProps {
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-corpiq-blue-50 via-white to-corpiq-bordeaux-50 flex">
+    <div className="min-h-[calc(100vh-40px)] bg-gradient-to-br from-corpiq-blue-50 via-white to-corpiq-bordeaux-50 flex">
       <div className="hidden lg:flex lg:w-1/2 bg-corpiq-blue relative overflow-hidden items-center justify-center">
         <div className="absolute inset-0 bg-gradient-to-br from-corpiq-blue via-corpiq-blue-dark to-corpiq-bordeaux opacity-90" />
         <div className="relative z-10 px-12 text-white max-w-md">

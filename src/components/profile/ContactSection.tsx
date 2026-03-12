@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building, User, MapPin, Phone, Mail, Home, Save, Info, UserPlus, X, Send } from 'lucide-react';
+import { Building, User, MapPin, Phone, Mail, Home, Save, Info, UserPlus, X, Send, MoreHorizontal, Crown, ShieldCheck, Users } from 'lucide-react';
 import { Card, CardHeader } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -7,6 +7,7 @@ import { StatusBanner } from '../ui/StatusBanner';
 import { Badge } from '../ui/Badge';
 import { Modal } from '../ui/Modal';
 import { useScenario } from '../../context/ScenarioContext';
+import { clsx } from 'clsx';
 import type { UserRole } from '../../types';
 
 function getRoleBadge(role: UserRole) {
@@ -17,19 +18,25 @@ function getRoleBadge(role: UserRole) {
   }
 }
 
-function getRoleLabel(role: UserRole) {
+function getRoleIcon(role: UserRole) {
   switch (role) {
-    case 'owner': return 'Propriétaire';
-    case 'admin': return 'Admin';
-    case 'delegate': return 'Délégué';
+    case 'owner': return <Crown size={12} />;
+    case 'admin': return <ShieldCheck size={12} />;
+    case 'delegate': return <Users size={12} />;
   }
 }
 
 const DEMO_USERS = [
-  { name: 'Jean Tremblay', email: 'jean.tremblay@email.com', role: 'owner' as UserRole },
-  { name: 'Marie Gagnon', email: 'marie.gagnon@email.com', role: 'admin' as UserRole },
-  { name: 'Pierre Dubois', email: 'pierre.dubois@email.com', role: 'delegate' as UserRole },
+  { name: 'Jean Tremblay', email: 'jean.tremblay@email.com', role: 'owner' as UserRole, initials: 'JT' },
+  { name: 'Marie Gagnon', email: 'marie.gagnon@email.com', role: 'admin' as UserRole, initials: 'MG' },
+  { name: 'Pierre Dubois', email: 'pierre.dubois@email.com', role: 'delegate' as UserRole, initials: 'PD' },
 ];
+
+const roleColors: Record<UserRole, string> = {
+  owner: 'from-emerald-500 to-emerald-600',
+  admin: 'from-blue-500 to-blue-600',
+  delegate: 'from-gray-400 to-gray-500',
+};
 
 export function ContactSection() {
   const { scenario } = useScenario();
@@ -87,7 +94,7 @@ export function ContactSection() {
 
           {orgSaved && (
             <div className="mb-5 animate-fade-in">
-              <StatusBanner variant="success" message="Vos informations ont été mises à jour." />
+              <StatusBanner variant="success" message="Informations de l'organisation mises à jour." />
             </div>
           )}
 
@@ -136,62 +143,67 @@ export function ContactSection() {
             />
 
             {canEditOrg && (
-              <div className="flex items-center justify-between pt-2">
-                {canInvite && (
-                  <Button
-                    variant="outline"
-                    icon={<UserPlus size={15} />}
-                    onClick={() => setInviteOpen(true)}
-                  >
-                    Inviter un utilisateur
-                  </Button>
-                )}
-                <div className={canInvite ? '' : 'ml-auto'}>
-                  <Button icon={<Save size={15} />} onClick={() => { setOrgSaved(true); setTimeout(() => setOrgSaved(false), 3000); }}>
-                    Enregistrer
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {canInvite && showOrganization && (
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Utilisateurs de l'organisation</p>
-                <div className="space-y-2">
-                  {DEMO_USERS.map((u) => (
-                    <div key={u.email} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-corpiq-blue to-corpiq-blue-light rounded-full flex items-center justify-center shadow-sm">
-                          <span className="text-white text-[10px] font-bold">
-                            {u.name.split(' ').map(n => n[0]).join('')}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900">{u.name}</p>
-                          <p className="text-xs text-gray-400">{u.email}</p>
-                        </div>
-                      </div>
-                      {getRoleBadge(u.role)}
-                    </div>
-                  ))}
-                </div>
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <Button icon={<Save size={15} />} onClick={() => { setOrgSaved(true); setTimeout(() => setOrgSaved(false), 3000); }}>
+                  Enregistrer
+                </Button>
               </div>
             )}
           </div>
+
+          {canInvite && showOrganization && (
+            <div className="mt-6 pt-5 border-t border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[13px] font-semibold text-gray-900">Utilisateurs de l'organisation</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  icon={<UserPlus size={14} />}
+                  onClick={() => setInviteOpen(true)}
+                >
+                  Inviter
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {DEMO_USERS.map((u) => (
+                  <div key={u.email} className="flex items-center justify-between p-3.5 bg-white rounded-xl border border-gray-100 hover:border-gray-200 transition-all">
+                    <div className="flex items-center gap-3">
+                      <div className={clsx(
+                        'w-9 h-9 bg-gradient-to-br rounded-full flex items-center justify-center shadow-sm',
+                        roleColors[u.role]
+                      )}>
+                        <span className="text-white text-[10px] font-bold">{u.initials}</span>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-gray-900">{u.name}</p>
+                          {getRoleBadge(u.role)}
+                        </div>
+                        <p className="text-xs text-gray-400 mt-0.5">{u.email}</p>
+                      </div>
+                    </div>
+                    <button className="p-1.5 rounded-lg hover:bg-gray-50 text-gray-400 hover:text-gray-600 transition-all">
+                      <MoreHorizontal size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </Card>
       )}
 
       <Card>
         <CardHeader
-          title="Utilisateur"
-          subtitle="Vos informations personnelles"
+          title="Informations personnelles"
+          subtitle="Votre profil utilisateur"
           icon={<User size={18} />}
           badge={getRoleBadge(scenario.role)}
         />
 
         {userSaved && (
           <div className="mb-5 animate-fade-in">
-            <StatusBanner variant="success" message="Vos informations ont été mises à jour." />
+            <StatusBanner variant="success" message="Vos informations personnelles ont été mises à jour." />
           </div>
         )}
 
@@ -209,12 +221,20 @@ export function ContactSection() {
           />
 
           {showOrganization && (
-            <label className="flex items-center gap-3 cursor-pointer select-none p-3.5 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100/80 transition-all">
+            <label className="flex items-center gap-3 cursor-pointer select-none p-3.5 rounded-xl border border-gray-100 hover:bg-gray-50/50 transition-all">
+              <div className={clsx(
+                'w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all',
+                useOrgAddress ? 'bg-corpiq-blue border-corpiq-blue' : 'border-gray-300'
+              )}>
+                {useOrgAddress && (
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                )}
+              </div>
               <input
                 type="checkbox"
                 checked={useOrgAddress}
                 onChange={(e) => setUseOrgAddress(e.target.checked)}
-                className="rounded"
+                className="sr-only"
               />
               <span className="text-sm text-gray-700 font-medium">Utiliser la même adresse que l'organisation</span>
             </label>
@@ -227,11 +247,6 @@ export function ContactSection() {
             icon={<MapPin size={16} />}
             hint="Adresse saisie via Google Places"
           />
-
-          <div className="flex items-start gap-2 text-xs text-gray-400 pt-1">
-            <Info size={13} className="flex-shrink-0 mt-0.5" />
-            <span>Modifiable par : propriétaire, admin, délégué</span>
-          </div>
 
           <div className="flex justify-end pt-2">
             <Button icon={<Save size={15} />} onClick={() => { setUserSaved(true); setTimeout(() => setUserSaved(false), 3000); }}>
@@ -249,12 +264,12 @@ export function ContactSection() {
       >
         <div className="space-y-5">
           {inviteSent ? (
-            <div className="text-center py-4 animate-fade-in">
-              <div className="w-14 h-14 mx-auto bg-emerald-50 rounded-2xl flex items-center justify-center mb-4">
-                <Send size={24} className="text-emerald-600" />
+            <div className="text-center py-6 animate-fade-in">
+              <div className="w-16 h-16 mx-auto bg-emerald-50 rounded-2xl flex items-center justify-center mb-4">
+                <Send size={28} className="text-emerald-600" />
               </div>
-              <p className="text-sm font-semibold text-gray-900">Invitation envoyée</p>
-              <p className="text-xs text-gray-500 mt-1">Un courriel a été envoyé à {inviteEmail}</p>
+              <p className="text-base font-bold text-gray-900">Invitation envoyée</p>
+              <p className="text-sm text-gray-500 mt-1">Un courriel a été envoyé à <span className="font-medium text-gray-700">{inviteEmail}</span></p>
             </div>
           ) : (
             <>
@@ -279,30 +294,38 @@ export function ContactSection() {
                   <button
                     type="button"
                     onClick={() => setInviteRole('admin')}
-                    className={`p-3 rounded-xl border text-left transition-all ${
+                    className={clsx(
+                      'p-4 rounded-xl border text-left transition-all',
                       inviteRole === 'admin'
                         ? 'border-corpiq-blue bg-corpiq-blue-50 ring-2 ring-corpiq-blue/10'
                         : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
+                    )}
                   >
-                    <p className={`text-sm font-semibold ${inviteRole === 'admin' ? 'text-corpiq-blue' : 'text-gray-700'}`}>
-                      Admin
-                    </p>
-                    <p className="text-[11px] text-gray-500 mt-0.5">Peut modifier l'organisation et inviter</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <ShieldCheck size={14} className={inviteRole === 'admin' ? 'text-corpiq-blue' : 'text-gray-400'} />
+                      <p className={clsx('text-sm font-bold', inviteRole === 'admin' ? 'text-corpiq-blue' : 'text-gray-700')}>
+                        Admin
+                      </p>
+                    </div>
+                    <p className="text-[11px] text-gray-500">Peut modifier l'organisation et inviter des utilisateurs</p>
                   </button>
                   <button
                     type="button"
                     onClick={() => setInviteRole('delegate')}
-                    className={`p-3 rounded-xl border text-left transition-all ${
+                    className={clsx(
+                      'p-4 rounded-xl border text-left transition-all',
                       inviteRole === 'delegate'
                         ? 'border-corpiq-blue bg-corpiq-blue-50 ring-2 ring-corpiq-blue/10'
                         : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
+                    )}
                   >
-                    <p className={`text-sm font-semibold ${inviteRole === 'delegate' ? 'text-corpiq-blue' : 'text-gray-700'}`}>
-                      Délégué
-                    </p>
-                    <p className="text-[11px] text-gray-500 mt-0.5">Profil personnel uniquement</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Users size={14} className={inviteRole === 'delegate' ? 'text-corpiq-blue' : 'text-gray-400'} />
+                      <p className={clsx('text-sm font-bold', inviteRole === 'delegate' ? 'text-corpiq-blue' : 'text-gray-700')}>
+                        Délégué
+                      </p>
+                    </div>
+                    <p className="text-[11px] text-gray-500">Accès limité au profil personnel uniquement</p>
                   </button>
                 </div>
                 <p className="text-[11px] text-gray-400 mt-2 flex items-center gap-1.5">

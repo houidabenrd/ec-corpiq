@@ -22,21 +22,22 @@ export function Layout() {
       <div className="min-h-screen flex flex-col bg-corpiq-light">
         <Header onToggleMobileMenu={() => {}} mobileMenuOpen={false} />
         <div className="flex-1 flex items-center justify-center p-6">
-          <div className="bg-white rounded-2xl shadow-card p-8 max-w-md w-full text-center space-y-6 animate-fade-in-up border border-gray-100">
-            <div className="w-16 h-16 mx-auto bg-gray-50 rounded-2xl flex items-center justify-center">
-              <Ban size={28} className="text-gray-400" />
+          <div className="bg-white rounded-2xl shadow-card p-10 max-w-md w-full text-center space-y-6 animate-fade-in-up border border-gray-100">
+            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-gray-100 to-gray-50 rounded-2xl flex items-center justify-center">
+              <Ban size={32} className="text-gray-400" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Compte désactivé</h2>
-              <p className="text-gray-500 mt-2 text-sm">
-                Veuillez contacter le support CORPIQ pour plus d'informations.
+              <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Compte désactivé</h2>
+              <p className="text-gray-500 mt-2 text-[15px] leading-relaxed">
+                Votre compte est actuellement désactivé. Veuillez contacter le support CORPIQ pour plus d'informations.
               </p>
             </div>
-            <p className="text-xs text-gray-400">Aucun accès aux modules.</p>
-            <Button fullWidth icon={<Headphones size={16} />}>Contacter le support</Button>
-            <Button variant="ghost" fullWidth onClick={() => navigate('/auth/login')}>
-              Retour à la connexion
-            </Button>
+            <div className="space-y-3 pt-2">
+              <Button fullWidth icon={<Headphones size={16} />}>Contacter le support</Button>
+              <Button variant="ghost" fullWidth onClick={() => navigate('/auth/login')}>
+                Retour à la connexion
+              </Button>
+            </div>
           </div>
         </div>
         <Footer />

@@ -62,9 +62,9 @@ export function LoginPage() {
         />
 
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2.5 text-sm text-gray-600 cursor-pointer select-none hover:text-gray-800 transition-colors">
-            <input type="checkbox" className="rounded" />
-            Se souvenir de moi
+          <label className="flex items-center gap-2.5 text-sm text-gray-600 cursor-pointer select-none hover:text-gray-800 transition-colors group">
+            <input type="checkbox" className="rounded accent-corpiq-blue" />
+            <span className="font-medium">Se souvenir de moi</span>
           </label>
           <button
             type="button"

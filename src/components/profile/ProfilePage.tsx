@@ -1,4 +1,5 @@
-import { ArrowLeft, Building, Shield, Bell, CreditCard } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, Building, Shield, Bell, CreditCard, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '../ui/Badge';
 import { useScenario } from '../../context/ScenarioContext';
@@ -7,6 +8,7 @@ import { SecuritySection } from './SecuritySection';
 import { PreferencesSection } from './PreferencesSection';
 import { BillingSection } from './BillingSection';
 import { StatusBanner } from '../ui/StatusBanner';
+import { clsx } from 'clsx';
 import type { MembershipState, UserRole } from '../../types';
 
 function getStateBadge(state: MembershipState) {
@@ -23,38 +25,52 @@ function getRoleLabel(role: UserRole, state: MembershipState) {
   if (state === 'NON_MEMBER') return 'Non-membre';
   switch (role) {
     case 'owner': return 'Propriétaire';
-    case 'admin': return 'Admin';
+    case 'admin': return 'Administrateur';
     case 'delegate': return 'Délégué';
   }
 }
 
+type Tab = 'contact' | 'security' | 'preferences' | 'billing';
+
+const tabs: { id: Tab; label: string; icon: React.ReactNode; requiresOwner?: boolean }[] = [
+  { id: 'contact', label: 'Contact', icon: <User size={16} /> },
+  { id: 'security', label: 'Sécurité', icon: <Shield size={16} /> },
+  { id: 'preferences', label: 'Préférences', icon: <Bell size={16} /> },
+  { id: 'billing', label: 'Facturation', icon: <CreditCard size={16} />, requiresOwner: true },
+];
+
 export function ProfilePage() {
   const navigate = useNavigate();
   const { scenario } = useScenario();
+  const [activeTab, setActiveTab] = useState<Tab>('contact');
 
   const isOwner = scenario.role === 'owner';
   const showBilling = scenario.billing_available && isOwner;
   const isExpired = scenario.membership_state === 'MEMBER_EXPIRED' || scenario.membership_state === 'MEMBER_GRACE_PERIOD';
 
+  const visibleTabs = tabs.filter(t => !t.requiresOwner || showBilling);
+
   return (
     <div className="max-w-4xl mx-auto p-6 lg:p-8 animate-fade-in">
-      <div className="flex items-center gap-4 mb-8">
+      <div className="mb-8">
         <button
           onClick={() => navigate('/dashboard')}
-          className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all"
+          className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-5"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={16} />
+          Retour au tableau de bord
         </button>
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-corpiq-blue to-corpiq-blue-light rounded-full flex items-center justify-center shadow-sm">
-            <span className="text-white text-sm font-bold">JT</span>
+
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 bg-gradient-to-br from-corpiq-blue to-corpiq-blue-light rounded-2xl flex items-center justify-center shadow-lg shadow-corpiq-blue/20">
+            <span className="text-white text-lg font-bold">JT</span>
           </div>
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-xl font-bold text-gray-900">Mon profil</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Mon profil</h1>
               {getStateBadge(scenario.membership_state)}
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mt-0.5">
               {getRoleLabel(scenario.role, scenario.membership_state)} — Jean Tremblay
             </p>
           </div>
@@ -79,63 +95,43 @@ export function ProfilePage() {
         />
       )}
 
-      <div className="space-y-8">
-        <section>
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-8 h-8 bg-corpiq-blue-50 rounded-lg flex items-center justify-center">
-              <Building size={16} className="text-corpiq-blue" />
+      <div className="flex gap-1 mb-8 bg-gray-100/80 p-1 rounded-xl overflow-x-auto">
+        {visibleTabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={clsx(
+              'flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap',
+              activeTab === tab.id
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            )}
+          >
+            <span className={clsx(
+              'transition-colors',
+              activeTab === tab.id ? 'text-corpiq-blue' : 'text-gray-400'
+            )}>
+              {tab.icon}
+            </span>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-6">
+        {activeTab === 'contact' && <ContactSection />}
+        {activeTab === 'security' && <SecuritySection />}
+        {activeTab === 'preferences' && <PreferencesSection />}
+        {activeTab === 'billing' && showBilling && <BillingSection />}
+
+        {activeTab === 'billing' && !showBilling && scenario.has_organization && scenario.role !== 'owner' && (
+          <div className="p-8 bg-gray-50 rounded-2xl border border-gray-100 text-center">
+            <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <CreditCard size={22} className="text-gray-300" />
             </div>
-            <h2 className="text-base font-semibold text-gray-900">Contact</h2>
-          </div>
-          <ContactSection />
-        </section>
-
-        <section>
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-8 h-8 bg-corpiq-blue-50 rounded-lg flex items-center justify-center">
-              <Shield size={16} className="text-corpiq-blue" />
-            </div>
-            <h2 className="text-base font-semibold text-gray-900">Sécurité & connexions</h2>
-          </div>
-          <SecuritySection />
-        </section>
-
-        <section>
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-8 h-8 bg-corpiq-blue-50 rounded-lg flex items-center justify-center">
-              <Bell size={16} className="text-corpiq-blue" />
-            </div>
-            <h2 className="text-base font-semibold text-gray-900">Préférences & consentements</h2>
-          </div>
-          <PreferencesSection />
-        </section>
-
-        {showBilling && (
-          <section>
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 bg-corpiq-blue-50 rounded-lg flex items-center justify-center">
-                <CreditCard size={16} className="text-corpiq-blue" />
-              </div>
-              <h2 className="text-base font-semibold text-gray-900">Informations bancaires</h2>
-            </div>
-            <BillingSection />
-          </section>
-        )}
-
-        {!showBilling && scenario.has_organization && scenario.role !== 'owner' && (
-          <div className="p-5 bg-gray-50 rounded-2xl border border-gray-100 text-center">
-            <p className="text-sm text-gray-500">
-              {scenario.role === 'admin'
-                ? 'Section informations bancaires masquée pour les administrateurs. Seul le propriétaire peut gérer les cartes de paiement.'
-                : 'Section informations bancaires masquée pour les délégués. Seul le propriétaire peut gérer les cartes de paiement.'}
-            </p>
-          </div>
-        )}
-
-        {!showBilling && !scenario.has_organization && (
-          <div className="p-5 bg-gray-50 rounded-2xl border border-gray-100 text-center">
-            <p className="text-sm text-gray-500">
-              Section informations bancaires masquée pour les non-membres.
+            <p className="text-sm font-semibold text-gray-600">Section réservée au propriétaire</p>
+            <p className="text-xs text-gray-400 mt-1">
+              Seul le propriétaire de l'organisation peut gérer les informations bancaires.
             </p>
           </div>
         )}

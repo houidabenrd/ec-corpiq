@@ -165,12 +165,12 @@ export function Sidebar({ mobile = false, onClose }: SidebarProps) {
       mobile ? 'w-full h-full' : 'w-60 h-[calc(100vh-96px)] sticky top-24 border-r border-gray-100'
     )}>
       {scenario.membership_state === 'MEMBER_IN_PROGRESS' && (
-        <div className="mx-3 mt-3 p-3 bg-amber-50 border border-amber-100 rounded-xl animate-fade-in">
-          <p className="text-xs font-semibold text-amber-800">Renouvellement en cours</p>
+        <div className="mx-3 mt-3 p-3.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-xl animate-fade-in">
+          <p className="text-xs font-bold text-amber-800">Renouvellement en cours</p>
           <p className="text-[11px] text-amber-600 mt-0.5">Accès membre maintenu</p>
           <button
             onClick={() => handleNav('/adhesion')}
-            className="mt-2.5 w-full text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded-lg py-1.5 transition-all active:scale-[0.98]"
+            className="mt-2.5 w-full text-xs font-bold text-white bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 rounded-lg py-2 transition-all active:scale-[0.98] shadow-sm"
           >
             Finaliser le renouvellement
           </button>
@@ -178,14 +178,14 @@ export function Sidebar({ mobile = false, onClose }: SidebarProps) {
       )}
 
       {isExpired && (
-        <div className="mx-3 mt-3 p-3 bg-red-50 border border-red-100 rounded-xl animate-fade-in">
-          <p className="text-xs font-semibold text-red-800">
+        <div className="mx-3 mt-3 p-3.5 bg-gradient-to-r from-red-50 to-rose-50 border border-red-100 rounded-xl animate-fade-in">
+          <p className="text-xs font-bold text-red-800">
             {scenario.membership_state === 'MEMBER_GRACE_PERIOD' ? 'Période de grâce' : 'Adhésion expirée'}
           </p>
           <p className="text-[11px] text-red-600 mt-0.5">Accès restreint — paiement seulement</p>
           <button
             onClick={() => handleNav('/adhesion')}
-            className="mt-2.5 w-full text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg py-1.5 transition-all active:scale-[0.98]"
+            className="mt-2.5 w-full text-xs font-bold text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-lg py-2 transition-all active:scale-[0.98] shadow-sm"
           >
             Renouveler / Payer
           </button>
@@ -193,12 +193,12 @@ export function Sidebar({ mobile = false, onClose }: SidebarProps) {
       )}
 
       {isNonMember && (
-        <div className="mx-3 mt-3 p-3 bg-corpiq-blue-50 border border-corpiq-blue-100 rounded-xl animate-fade-in">
-          <p className="text-xs font-semibold text-corpiq-blue">Accès découverte</p>
+        <div className="mx-3 mt-3 p-3.5 bg-gradient-to-r from-corpiq-blue-50 to-blue-50 border border-corpiq-blue-100 rounded-xl animate-fade-in">
+          <p className="text-xs font-bold text-corpiq-blue">Accès découverte</p>
           <p className="text-[11px] text-gray-500 mt-0.5">Certains services sont réservés aux membres</p>
           <button
             onClick={() => handleNav('/adhesion')}
-            className="mt-2.5 w-full text-xs font-semibold text-white bg-corpiq-blue hover:bg-corpiq-blue-light rounded-lg py-1.5 transition-all active:scale-[0.98]"
+            className="mt-2.5 w-full text-xs font-bold text-white bg-gradient-to-r from-corpiq-blue to-corpiq-blue-light hover:opacity-90 rounded-lg py-2 transition-all active:scale-[0.98] shadow-sm"
           >
             Adhérer maintenant
           </button>
@@ -229,7 +229,7 @@ export function Sidebar({ mobile = false, onClose }: SidebarProps) {
                   }
                 }}
                 className={clsx(
-                  'w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-150 group relative',
+                  'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] transition-all duration-150 group relative',
                   (isActive || isParentActive) && !isGrayed && 'bg-corpiq-blue text-white font-semibold shadow-sm',
                   !(isActive || isParentActive) && !isGrayed && 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                   isGrayed && 'text-gray-400 cursor-not-allowed opacity-40',
@@ -260,7 +260,7 @@ export function Sidebar({ mobile = false, onClose }: SidebarProps) {
               </button>
 
               {hasChildren && isOpen && !isGrayed && (
-                <div className="ml-5 pl-3 border-l border-gray-100 mt-0.5 mb-1 space-y-0.5 animate-fade-in">
+                <div className="ml-5 pl-3 border-l-2 border-gray-100 mt-0.5 mb-1 space-y-0.5 animate-fade-in">
                   {item.children!.map((child) => {
                     const isChildItemActive = location.pathname === child.path;
                     return (
@@ -290,6 +290,18 @@ export function Sidebar({ mobile = false, onClose }: SidebarProps) {
           );
         })}
       </nav>
+
+      <div className="p-3 border-t border-gray-100">
+        <div className="flex items-center gap-3 px-3 py-2">
+          <div className="w-8 h-8 bg-gradient-to-br from-corpiq-blue to-corpiq-blue-light rounded-full flex items-center justify-center shadow-sm">
+            <span className="text-white text-[10px] font-bold">JT</span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-gray-900 truncate">Jean Tremblay</p>
+            <p className="text-[10px] text-gray-400 truncate">jean.tremblay@email.com</p>
+          </div>
+        </div>
+      </div>
     </aside>
   );
 }

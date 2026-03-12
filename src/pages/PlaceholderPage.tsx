@@ -22,19 +22,21 @@ export function PlaceholderPage({ title, icon }: PlaceholderPageProps) {
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in">
-      <div className="flex items-center gap-2.5 mb-2">
-        <h1 className="text-xl font-bold text-gray-900">{title}</h1>
+      <div className="flex items-center gap-2.5 mb-1">
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{title}</h1>
         {getStateBadge(scenario.membership_state)}
       </div>
       <p className="text-sm text-gray-400 mb-8">Module à venir</p>
 
-      <div className="flex items-center justify-center min-h-[400px] bg-white rounded-2xl border border-dashed border-gray-200 shadow-card">
-        <div className="text-center">
-          <div className="w-14 h-14 mx-auto bg-gray-50 rounded-2xl flex items-center justify-center text-gray-300 mb-4">
+      <div className="flex items-center justify-center min-h-[400px] bg-white rounded-2xl border-2 border-dashed border-gray-200 shadow-card">
+        <div className="text-center px-6">
+          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-gray-100 to-gray-50 rounded-2xl flex items-center justify-center text-gray-300 mb-4">
             {icon}
           </div>
-          <p className="text-gray-400 font-semibold text-sm">{title}</p>
-          <p className="text-xs text-gray-300 mt-1">Contenu à implémenter</p>
+          <p className="text-gray-500 font-bold text-base">{title}</p>
+          <p className="text-sm text-gray-400 mt-1.5 max-w-xs mx-auto leading-relaxed">
+            Ce module sera disponible dans une prochaine version du prototype.
+          </p>
         </div>
       </div>
     </div>

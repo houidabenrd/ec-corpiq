@@ -14,15 +14,17 @@ import {
   Shield,
   Navigation,
   UserCircle,
+  Sparkles,
 } from 'lucide-react';
 import { useScenario } from '../context/ScenarioContext';
+import { clsx } from 'clsx';
 
 const personas = [
   {
     presetIndex: 0,
     icon: <UserX size={22} />,
     color: 'from-slate-500 to-slate-600',
-    iconBg: 'bg-slate-100 text-slate-600',
+    ring: 'ring-slate-500/20',
     tag: 'Non-membre',
     title: 'Non-membre',
     description: 'Utilisateur sans adhésion CORPIQ. Accès découverte limité aux outils publics.',
@@ -37,7 +39,7 @@ const personas = [
     presetIndex: 1,
     icon: <UserCheck size={22} />,
     color: 'from-emerald-500 to-emerald-600',
-    iconBg: 'bg-emerald-100 text-emerald-600',
+    ring: 'ring-emerald-500/20',
     tag: 'Propriétaire',
     title: 'Propriétaire (owner)',
     description: 'Membre principal unique. Accès complet : organisation, facturation, invitations.',
@@ -52,7 +54,7 @@ const personas = [
     presetIndex: 2,
     icon: <Shield size={22} />,
     color: 'from-blue-500 to-blue-600',
-    iconBg: 'bg-blue-100 text-blue-600',
+    ring: 'ring-blue-500/20',
     tag: 'Admin',
     title: 'Administrateur',
     description: 'Même accès organisation que le propriétaire, sans la section bancaire.',
@@ -67,7 +69,7 @@ const personas = [
     presetIndex: 3,
     icon: <Users size={22} />,
     color: 'from-teal-500 to-teal-600',
-    iconBg: 'bg-teal-100 text-teal-600',
+    ring: 'ring-teal-500/20',
     tag: 'Délégué',
     title: 'Délégué',
     description: 'Rattaché à une organisation. Accès limité au profil personnel.',
@@ -81,7 +83,7 @@ const personas = [
     presetIndex: 4,
     icon: <RefreshCw size={22} />,
     color: 'from-amber-500 to-amber-600',
-    iconBg: 'bg-amber-100 text-amber-600',
+    ring: 'ring-amber-500/20',
     tag: 'En renouvellement',
     title: 'En renouvellement',
     description: 'Renouvellement en cours. Accès complet maintenu sans restriction.',
@@ -95,7 +97,7 @@ const personas = [
     presetIndex: 5,
     icon: <AlertTriangle size={22} />,
     color: 'from-red-500 to-red-600',
-    iconBg: 'bg-red-100 text-red-600',
+    ring: 'ring-red-500/20',
     tag: 'Expiré',
     title: 'Expiré',
     description: 'Adhésion expirée. Accès restreint, services premium masqués.',
@@ -109,7 +111,7 @@ const personas = [
     presetIndex: 6,
     icon: <Clock size={22} />,
     color: 'from-orange-500 to-orange-600',
-    iconBg: 'bg-orange-100 text-orange-600',
+    ring: 'ring-orange-500/20',
     tag: 'Période de grâce',
     title: 'Période de grâce',
     description: 'Même comportement que expiré. Accès limité au renouvellement.',
@@ -123,7 +125,7 @@ const personas = [
     presetIndex: 7,
     icon: <Ban size={22} />,
     color: 'from-gray-600 to-gray-800',
-    iconBg: 'bg-gray-100 text-gray-600',
+    ring: 'ring-gray-500/20',
     tag: 'Inactif',
     title: 'Utilisateur inactif',
     description: 'Compte désactivé. Aucun accès aux modules.',
@@ -136,9 +138,9 @@ const personas = [
 ];
 
 const modules = [
-  { icon: <Shield size={18} />, t: 'Inscription & Connexion', d: '6 workflows : inscription, connexion classique/SSO, mot de passe oublié, vérification courriel' },
-  { icon: <Navigation size={18} />, t: 'Menu de navigation', d: 'Menu dynamique selon état membre et rôle (propriétaire, admin, délégué)' },
-  { icon: <UserCircle size={18} />, t: 'Profil utilisateur', d: '4 sections : contact, sécurité, préférences, facturation — droits par rôle' },
+  { icon: <Shield size={20} />, t: 'Inscription & Connexion', d: '6 workflows : inscription, connexion classique/SSO, mot de passe oublié, vérification courriel', color: 'from-blue-500 to-blue-600' },
+  { icon: <Navigation size={20} />, t: 'Menu de navigation', d: 'Menu dynamique selon état membre et rôle (propriétaire, admin, délégué)', color: 'from-violet-500 to-violet-600' },
+  { icon: <UserCircle size={20} />, t: 'Profil utilisateur', d: '4 sections : contact, sécurité, préférences, facturation — droits par rôle', color: 'from-emerald-500 to-emerald-600' },
 ];
 
 export function PrototypeHub() {
@@ -156,7 +158,7 @@ export function PrototypeHub() {
       <header className="glass border-b border-gray-200/60 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-corpiq-blue rounded-xl flex items-center justify-center">
+            <div className="w-9 h-9 bg-corpiq-blue rounded-xl flex items-center justify-center shadow-lg shadow-corpiq-blue/20">
               <Building2 size={20} className="text-white" />
             </div>
             <div>
@@ -167,14 +169,14 @@ export function PrototypeHub() {
           <div className="flex gap-2">
             <button
               onClick={() => { setIsAuthenticated(false); navigate('/auth/login'); }}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-corpiq-blue bg-corpiq-blue-50 rounded-xl hover:bg-corpiq-blue-100 active:scale-[0.98] transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-corpiq-blue bg-corpiq-blue-50 rounded-xl hover:bg-corpiq-blue-100 active:scale-[0.98] transition-all"
             >
               <LogIn size={15} />
               <span className="hidden sm:inline">Connexion</span>
             </button>
             <button
               onClick={() => { setIsAuthenticated(false); navigate('/auth/register'); }}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-corpiq-blue rounded-xl hover:bg-corpiq-blue-light active:scale-[0.98] transition-all shadow-sm"
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-corpiq-blue rounded-xl hover:bg-corpiq-blue-light active:scale-[0.98] transition-all shadow-lg shadow-corpiq-blue/20"
             >
               <UserPlus size={15} />
               <span className="hidden sm:inline">Inscription</span>
@@ -184,81 +186,75 @@ export function PrototypeHub() {
       </header>
 
       <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="text-center mb-12 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-corpiq-blue-50 text-corpiq-blue text-xs font-semibold rounded-lg mb-4">
-            <span className="w-1.5 h-1.5 bg-corpiq-blue rounded-full animate-pulse-soft" />
+        <div className="text-center mb-14 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-corpiq-blue-50 text-corpiq-blue text-xs font-semibold rounded-full mb-5">
+            <Sparkles size={13} />
             Prototype interactif
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 text-balance">
-            Sélectionnez un profil utilisateur
+          <h2 className="text-4xl font-bold text-gray-900 tracking-tight">
+            Sélectionnez un profil
           </h2>
-          <p className="text-gray-500 mt-3 max-w-xl mx-auto text-[15px] leading-relaxed">
-            Chaque carte représente un type d'utilisateur. Cliquez pour explorer le menu de navigation et le profil adaptés.
+          <p className="text-gray-500 mt-3 max-w-xl mx-auto text-base leading-relaxed">
+            Chaque carte représente un type d'utilisateur. Cliquez pour explorer le menu et le profil adaptés.
           </p>
         </div>
 
-        <div className="mb-10 bg-white rounded-2xl border border-gray-100 p-6 shadow-card animate-fade-in">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wider">3 modules du prototype</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {modules.map((m, i) => (
-              <div key={i} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
-                <div className="w-9 h-9 bg-corpiq-blue-50 text-corpiq-blue rounded-lg flex items-center justify-center flex-shrink-0">
-                  {m.icon}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">{m.t}</p>
-                  <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{m.d}</p>
-                </div>
+        <div className="mb-12 grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
+          {modules.map((m, i) => (
+            <div key={i} className="relative overflow-hidden bg-white rounded-2xl border border-gray-100 p-5 shadow-card">
+              <div className={clsx('w-10 h-10 bg-gradient-to-br rounded-xl flex items-center justify-center text-white shadow-sm mb-3', m.color)}>
+                {m.icon}
               </div>
-            ))}
-          </div>
+              <p className="text-sm font-bold text-gray-900 mb-1">{m.t}</p>
+              <p className="text-xs text-gray-500 leading-relaxed">{m.d}</p>
+            </div>
+          ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {personas.map((p, idx) => (
-            <div
+            <button
               key={p.presetIndex}
-              className="bg-white rounded-2xl border border-gray-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-0.5 group animate-fade-in-up overflow-hidden"
-              style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'backwards' }}
+              onClick={() => handleSelectPersona(p.presetIndex)}
+              className={clsx(
+                'group bg-white rounded-2xl border border-gray-100 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 text-left animate-fade-in-up overflow-hidden',
+                `ring-0 hover:ring-4 ${p.ring}`
+              )}
+              style={{ animationDelay: `${idx * 40}ms`, animationFillMode: 'backwards' }}
             >
-              <div className={`bg-gradient-to-r ${p.color} px-5 py-4 flex items-center gap-3 text-white`}>
-                <div className="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center backdrop-blur-sm">
+              <div className={clsx('bg-gradient-to-r px-4 py-3.5 flex items-center gap-3 text-white', p.color)}>
+                <div className="w-9 h-9 bg-white/15 rounded-xl flex items-center justify-center backdrop-blur-sm flex-shrink-0">
                   {p.icon}
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest opacity-80">
+                <div className="min-w-0">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-white/60 block">
                     {p.tag}
                   </span>
-                  <h3 className="font-bold text-[15px] leading-tight">{p.title}</h3>
+                  <h3 className="font-bold text-[13px] leading-tight truncate">{p.title}</h3>
                 </div>
               </div>
 
-              <div className="p-5">
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed">{p.description}</p>
+              <div className="p-4">
+                <p className="text-xs text-gray-500 mb-3 leading-relaxed line-clamp-2">{p.description}</p>
 
-                <ul className="space-y-2 mb-5">
-                  {p.details.map((d, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-[13px] text-gray-500">
-                      <span className="w-1 h-1 rounded-full bg-gray-300 mt-2 flex-shrink-0" />
-                      {d}
+                <ul className="space-y-1.5 mb-4">
+                  {p.details.slice(0, 3).map((d, i) => (
+                    <li key={i} className="flex items-start gap-2 text-[11px] text-gray-400">
+                      <span className="w-1 h-1 rounded-full bg-gray-300 mt-1.5 flex-shrink-0" />
+                      <span className="line-clamp-1">{d}</span>
                     </li>
                   ))}
                 </ul>
 
-                <button
-                  onClick={() => handleSelectPersona(p.presetIndex)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
-                  style={{
-                    backgroundImage: `linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-to))`,
-                  }}
-                >
-                  <span className={`bg-gradient-to-r ${p.color} bg-clip-text text-transparent`} style={{ color: 'white' }}>
-                    Voir l'expérience
-                  </span>
-                  <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
-                </button>
+                <div className={clsx(
+                  'flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r text-white shadow-sm transition-all group-hover:shadow-md',
+                  p.color
+                )}>
+                  Voir l'expérience
+                  <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+                </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>

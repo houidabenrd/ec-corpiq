@@ -37,7 +37,7 @@ export function LoginPage() {
           placeholder="votre@courriel.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          icon={<Mail size={18} />}
+          icon={<Mail size={16} />}
           required
         />
 
@@ -47,7 +47,7 @@ export function LoginPage() {
           placeholder="Votre mot de passe"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          icon={<Lock size={18} />}
+          icon={<Lock size={16} />}
           trailing={
             <button
               type="button"
@@ -55,21 +55,21 @@ export function LoginPage() {
               className="text-gray-400 hover:text-gray-600 transition-colors p-0.5"
               tabIndex={-1}
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           }
           required
         />
 
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none hover:text-gray-800 transition-colors">
-            <input type="checkbox" className="rounded border-gray-300 text-corpiq-blue focus:ring-corpiq-blue" />
+          <label className="flex items-center gap-2.5 text-sm text-gray-600 cursor-pointer select-none hover:text-gray-800 transition-colors">
+            <input type="checkbox" className="rounded" />
             Se souvenir de moi
           </label>
           <button
             type="button"
             onClick={() => navigate('/auth/forgot-password')}
-            className="text-sm font-medium text-corpiq-accent hover:text-corpiq-accent-light hover:underline underline-offset-2 transition-all"
+            className="text-sm font-semibold text-corpiq-accent hover:text-corpiq-accent-light transition-colors"
           >
             Mot de passe oublié ?
           </button>
@@ -82,10 +82,10 @@ export function LoginPage() {
 
       <div className="relative my-8">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200" />
+          <div className="w-full border-t border-gray-100" />
         </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-white text-gray-500">ou continuer avec</span>
+        <div className="relative flex justify-center text-xs">
+          <span className="px-4 bg-corpiq-light text-gray-400 font-medium">ou continuer avec</span>
         </div>
       </div>
 
@@ -95,7 +95,7 @@ export function LoginPage() {
         Pas encore de compte ?{' '}
         <button
           onClick={() => navigate('/auth/register')}
-          className="font-medium text-corpiq-accent hover:text-corpiq-accent-light hover:underline underline-offset-2 transition-all"
+          className="font-semibold text-corpiq-accent hover:text-corpiq-accent-light transition-colors"
         >
           Créer mon compte
         </button>

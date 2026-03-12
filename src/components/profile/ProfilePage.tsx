@@ -1,4 +1,4 @@
-import { ArrowLeft, UserCircle } from 'lucide-react';
+import { ArrowLeft, Building, Shield, Bell, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '../ui/Badge';
 import { useScenario } from '../../context/ScenarioContext';
@@ -7,7 +7,7 @@ import { SecuritySection } from './SecuritySection';
 import { PreferencesSection } from './PreferencesSection';
 import { BillingSection } from './BillingSection';
 import { StatusBanner } from '../ui/StatusBanner';
-import type { MembershipState } from '../../types';
+import type { MembershipState, UserRole } from '../../types';
 
 function getStateBadge(state: MembershipState) {
   switch (state) {
@@ -19,17 +19,21 @@ function getStateBadge(state: MembershipState) {
   }
 }
 
-function getRoleName(state: MembershipState, isPrimary: boolean) {
+function getRoleLabel(role: UserRole, state: MembershipState) {
   if (state === 'NON_MEMBER') return 'Non-membre';
-  if (!isPrimary) return 'Délégué';
-  return 'Membre principal';
+  switch (role) {
+    case 'owner': return 'Propriétaire';
+    case 'admin': return 'Admin';
+    case 'delegate': return 'Délégué';
+  }
 }
 
 export function ProfilePage() {
   const navigate = useNavigate();
   const { scenario } = useScenario();
 
-  const showBilling = scenario.billing_available && scenario.is_primary_member;
+  const isOwner = scenario.role === 'owner';
+  const showBilling = scenario.billing_available && isOwner;
   const isExpired = scenario.membership_state === 'MEMBER_EXPIRED' || scenario.membership_state === 'MEMBER_GRACE_PERIOD';
 
   return (
@@ -37,21 +41,21 @@ export function ProfilePage() {
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={() => navigate('/dashboard')}
-          className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all"
         >
           <ArrowLeft size={20} />
         </button>
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-corpiq-blue-50 rounded-full flex items-center justify-center">
-            <UserCircle size={28} className="text-corpiq-blue" />
+          <div className="w-12 h-12 bg-gradient-to-br from-corpiq-blue to-corpiq-blue-light rounded-full flex items-center justify-center shadow-sm">
+            <span className="text-white text-sm font-bold">JT</span>
           </div>
           <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-gray-900">Mon profil</h1>
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl font-bold text-gray-900">Mon profil</h1>
               {getStateBadge(scenario.membership_state)}
             </div>
             <p className="text-sm text-gray-500">
-              {getRoleName(scenario.membership_state, scenario.is_primary_member)} — Jean Tremblay
+              {getRoleLabel(scenario.role, scenario.membership_state)} — Jean Tremblay
             </p>
           </div>
         </div>
@@ -77,50 +81,59 @@ export function ProfilePage() {
 
       <div className="space-y-8">
         <section>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <span className="w-8 h-8 bg-corpiq-blue-50 rounded-lg flex items-center justify-center text-corpiq-blue text-sm font-bold">A</span>
-            Contact
-          </h2>
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="w-8 h-8 bg-corpiq-blue-50 rounded-lg flex items-center justify-center">
+              <Building size={16} className="text-corpiq-blue" />
+            </div>
+            <h2 className="text-base font-semibold text-gray-900">Contact</h2>
+          </div>
           <ContactSection />
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <span className="w-8 h-8 bg-corpiq-blue-50 rounded-lg flex items-center justify-center text-corpiq-blue text-sm font-bold">B</span>
-            Sécurité & connexions
-          </h2>
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="w-8 h-8 bg-corpiq-blue-50 rounded-lg flex items-center justify-center">
+              <Shield size={16} className="text-corpiq-blue" />
+            </div>
+            <h2 className="text-base font-semibold text-gray-900">Sécurité & connexions</h2>
+          </div>
           <SecuritySection />
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <span className="w-8 h-8 bg-corpiq-blue-50 rounded-lg flex items-center justify-center text-corpiq-blue text-sm font-bold">C</span>
-            Préférences & consentements
-          </h2>
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="w-8 h-8 bg-corpiq-blue-50 rounded-lg flex items-center justify-center">
+              <Bell size={16} className="text-corpiq-blue" />
+            </div>
+            <h2 className="text-base font-semibold text-gray-900">Préférences & consentements</h2>
+          </div>
           <PreferencesSection />
         </section>
 
         {showBilling && (
           <section>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="w-8 h-8 bg-corpiq-blue-50 rounded-lg flex items-center justify-center text-corpiq-blue text-sm font-bold">D</span>
-              Informations bancaires
-            </h2>
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-8 h-8 bg-corpiq-blue-50 rounded-lg flex items-center justify-center">
+                <CreditCard size={16} className="text-corpiq-blue" />
+              </div>
+              <h2 className="text-base font-semibold text-gray-900">Informations bancaires</h2>
+            </div>
             <BillingSection />
           </section>
         )}
 
-        {!showBilling && scenario.has_organization && !scenario.is_primary_member && (
-          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-center">
+        {!showBilling && scenario.has_organization && scenario.role !== 'owner' && (
+          <div className="p-5 bg-gray-50 rounded-2xl border border-gray-100 text-center">
             <p className="text-sm text-gray-500">
-              Section informations bancaires masquée pour les délégués.
-              Seul le membre principal peut gérer les cartes de paiement.
+              {scenario.role === 'admin'
+                ? 'Section informations bancaires masquée pour les administrateurs. Seul le propriétaire peut gérer les cartes de paiement.'
+                : 'Section informations bancaires masquée pour les délégués. Seul le propriétaire peut gérer les cartes de paiement.'}
             </p>
           </div>
         )}
 
         {!showBilling && !scenario.has_organization && (
-          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-center">
+          <div className="p-5 bg-gray-50 rounded-2xl border border-gray-100 text-center">
             <p className="text-sm text-gray-500">
               Section informations bancaires masquée pour les non-membres.
             </p>

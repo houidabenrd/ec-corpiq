@@ -8,6 +8,7 @@ export const scenarioPresets: ScenarioPreset[] = [
     scenario: {
       membership_state: 'NON_MEMBER',
       user_active: true,
+      role: 'owner',
       is_primary_member: false,
       has_password_auth: true,
       google_linked: false,
@@ -22,12 +23,13 @@ export const scenarioPresets: ScenarioPreset[] = [
     },
   },
   {
-    label: 'Membre actif (principal)',
-    description: 'Membre principal avec accès complet',
+    label: 'Membre actif (propriétaire)',
+    description: 'Propriétaire avec accès complet + bancaire',
     color: 'bg-green-500',
     scenario: {
       membership_state: 'MEMBER_ACTIVE',
       user_active: true,
+      role: 'owner',
       is_primary_member: true,
       has_password_auth: true,
       google_linked: true,
@@ -42,12 +44,34 @@ export const scenarioPresets: ScenarioPreset[] = [
     },
   },
   {
+    label: 'Membre actif (admin)',
+    description: 'Admin : même accès org que owner, sans bancaire',
+    color: 'bg-blue-500',
+    scenario: {
+      membership_state: 'MEMBER_ACTIVE',
+      user_active: true,
+      role: 'admin',
+      is_primary_member: false,
+      has_password_auth: true,
+      google_linked: true,
+      microsoft_linked: false,
+      has_organization: true,
+      organization_editable: true,
+      billing_available: false,
+      has_primary_card: false,
+      has_secondary_card: false,
+      ams_available: true,
+      cgu_accepted: true,
+    },
+  },
+  {
     label: 'Membre actif (délégué)',
-    description: 'Délégué, organisation en lecture seule',
+    description: 'Délégué : organisation lecture seule, pas de bancaire',
     color: 'bg-green-400',
     scenario: {
       membership_state: 'MEMBER_ACTIVE',
       user_active: true,
+      role: 'delegate',
       is_primary_member: false,
       has_password_auth: true,
       google_linked: false,
@@ -68,6 +92,7 @@ export const scenarioPresets: ScenarioPreset[] = [
     scenario: {
       membership_state: 'MEMBER_IN_PROGRESS',
       user_active: true,
+      role: 'owner',
       is_primary_member: true,
       has_password_auth: true,
       google_linked: true,
@@ -88,6 +113,7 @@ export const scenarioPresets: ScenarioPreset[] = [
     scenario: {
       membership_state: 'MEMBER_EXPIRED',
       user_active: true,
+      role: 'owner',
       is_primary_member: true,
       has_password_auth: true,
       google_linked: false,
@@ -108,6 +134,7 @@ export const scenarioPresets: ScenarioPreset[] = [
     scenario: {
       membership_state: 'MEMBER_GRACE_PERIOD',
       user_active: true,
+      role: 'owner',
       is_primary_member: true,
       has_password_auth: true,
       google_linked: false,
@@ -128,6 +155,7 @@ export const scenarioPresets: ScenarioPreset[] = [
     scenario: {
       membership_state: 'NON_MEMBER',
       user_active: false,
+      role: 'delegate',
       is_primary_member: false,
       has_password_auth: true,
       google_linked: false,
@@ -144,10 +172,11 @@ export const scenarioPresets: ScenarioPreset[] = [
   {
     label: 'SSO uniquement',
     description: 'Connexion via Google uniquement, pas de mot de passe',
-    color: 'bg-blue-500',
+    color: 'bg-indigo-500',
     scenario: {
       membership_state: 'MEMBER_ACTIVE',
       user_active: true,
+      role: 'owner',
       is_primary_member: true,
       has_password_auth: false,
       google_linked: true,
@@ -168,6 +197,7 @@ export const scenarioPresets: ScenarioPreset[] = [
     scenario: {
       membership_state: 'MEMBER_ACTIVE',
       user_active: true,
+      role: 'owner',
       is_primary_member: true,
       has_password_auth: true,
       google_linked: false,
@@ -183,11 +213,12 @@ export const scenarioPresets: ScenarioPreset[] = [
   },
   {
     label: 'Membre sans carte',
-    description: 'Membre principal sans carte bancaire enregistrée',
+    description: 'Propriétaire sans carte bancaire enregistrée',
     color: 'bg-amber-600',
     scenario: {
       membership_state: 'MEMBER_ACTIVE',
       user_active: true,
+      role: 'owner',
       is_primary_member: true,
       has_password_auth: true,
       google_linked: false,

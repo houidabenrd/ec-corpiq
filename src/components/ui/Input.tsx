@@ -14,28 +14,28 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="space-y-1.5">
         {label && (
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-[13px] font-semibold text-gray-600 tracking-wide">
             {label}
           </label>
         )}
         <div className="relative group">
           {icon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors group-focus-within:text-corpiq-blue">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 transition-colors group-focus-within:text-corpiq-blue">
               {icon}
             </div>
           )}
           <input
             ref={ref}
             className={clsx(
-              'w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm text-gray-900 transition-all duration-200',
+              'w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-gray-900 transition-all duration-150',
               'placeholder:text-gray-400',
-              'focus:outline-none focus:ring-2 focus:ring-corpiq-blue/20 focus:border-corpiq-blue',
+              'focus:outline-none focus:ring-2 focus:ring-corpiq-blue/10 focus:border-corpiq-blue focus:shadow-input-focus',
               error
-                ? 'border-red-300 focus:ring-red-200 focus:border-red-500'
-                : 'border-gray-300 hover:border-gray-400',
-              icon && 'pl-10',
-              trailing && 'pr-10',
-              (disabled || readOnly) && 'bg-gray-50 text-gray-500 cursor-not-allowed hover:border-gray-300',
+                ? 'border-red-300 focus:ring-red-100 focus:border-red-500'
+                : 'border-gray-200 hover:border-gray-300',
+              icon && 'pl-11',
+              trailing && 'pr-11',
+              (disabled || readOnly) && 'bg-gray-50 text-gray-500 cursor-not-allowed hover:border-gray-200',
               className
             )}
             disabled={disabled}
@@ -43,13 +43,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           {trailing && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2">
               {trailing}
             </div>
           )}
         </div>
-        {error && <p className="text-xs text-red-600">{error}</p>}
-        {hint && !error && <p className="text-xs text-gray-500">{hint}</p>}
+        {error && <p className="text-xs font-medium text-red-600 flex items-center gap-1">{error}</p>}
+        {hint && !error && <p className="text-xs text-gray-400">{hint}</p>}
       </div>
     );
   }

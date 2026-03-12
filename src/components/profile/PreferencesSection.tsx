@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Save } from 'lucide-react';
+import { Save, Bell } from 'lucide-react';
 import { Card, CardHeader } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -27,25 +27,26 @@ export function PreferencesSection() {
           title="Préférences de communication"
           subtitle="Synchronisées avec Mailchimp via le backend"
           badge={<Badge variant="purple">Loi 25</Badge>}
+          icon={<Bell size={18} />}
         />
 
         {saved && (
-          <StatusBanner variant="success" message="Vos informations ont été mises à jour." className="mb-5" />
+          <StatusBanner variant="success" message="Vos informations ont été mises à jour." className="mb-5 animate-fade-in" />
         )}
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {preferences.map((pref) => (
             <label
               key={pref.id}
-              className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors"
+              className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer hover:bg-gray-100/80 transition-all"
             >
               <input
                 type="checkbox"
                 defaultChecked={pref.checked}
-                className="mt-0.5 rounded border-gray-300 text-corpiq-blue focus:ring-corpiq-blue"
+                className="mt-0.5 rounded"
               />
               <div>
-                <p className="text-sm font-medium text-gray-900">{pref.label}</p>
+                <p className="text-sm font-semibold text-gray-900">{pref.label}</p>
                 <p className="text-xs text-gray-500 mt-0.5">{pref.desc}</p>
               </div>
             </label>
@@ -57,7 +58,7 @@ export function PreferencesSection() {
         </p>
 
         <div className="flex justify-end pt-4">
-          <Button icon={<Save size={16} />} onClick={handleSave}>
+          <Button icon={<Save size={15} />} onClick={handleSave}>
             Enregistrer mes préférences
           </Button>
         </div>
@@ -71,16 +72,16 @@ export function PreferencesSection() {
         <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Version</p>
-              <p className="text-sm text-gray-900 mt-1">2.1</p>
+              <p className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Version</p>
+              <p className="text-sm text-gray-900 mt-1 font-medium">2.1</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Date d'acceptation</p>
-              <p className="text-sm text-gray-900 mt-1">15 janvier 2026</p>
+              <p className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">Date d'acceptation</p>
+              <p className="text-sm text-gray-900 mt-1 font-medium">15 janvier 2026</p>
             </div>
           </div>
           <div className="mt-4 pt-4 border-t border-gray-200">
-            <button className="text-sm text-corpiq-accent hover:text-corpiq-accent-light font-medium transition-colors">
+            <button className="text-sm text-corpiq-accent hover:text-corpiq-accent-light font-semibold transition-colors">
               Consulter les CGU complètes
             </button>
           </div>

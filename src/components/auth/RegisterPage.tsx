@@ -39,7 +39,7 @@ export function RegisterPage() {
 
       <form onSubmit={handleRegister} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <Input label="Prénom" placeholder="Jean" icon={<User size={18} />} required />
+          <Input label="Prénom" placeholder="Jean" icon={<User size={16} />} required />
           <Input label="Nom" placeholder="Tremblay" required />
         </div>
 
@@ -47,7 +47,7 @@ export function RegisterPage() {
           label="Adresse courriel"
           type="email"
           placeholder="votre@courriel.com"
-          icon={<Mail size={18} />}
+          icon={<Mail size={16} />}
           required
         />
 
@@ -55,7 +55,7 @@ export function RegisterPage() {
           label="Mot de passe"
           type={showPassword ? 'text' : 'password'}
           placeholder="Minimum 8 caractères"
-          icon={<Lock size={18} />}
+          icon={<Lock size={16} />}
           trailing={
             <button
               type="button"
@@ -63,23 +63,23 @@ export function RegisterPage() {
               className="text-gray-400 hover:text-gray-600 transition-colors p-0.5"
               tabIndex={-1}
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           }
           required
         />
 
         <div className="pt-2">
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+          <label className="block text-[13px] font-semibold text-gray-600 mb-3 tracking-wide">
             Êtes-vous membre CORPIQ ?
           </label>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => { setIsMember(true); setCardError(''); }}
-              className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
+              className={`p-3 rounded-xl border text-sm font-semibold transition-all ${
                 isMember === true
-                  ? 'border-corpiq-blue bg-corpiq-blue-50 text-corpiq-blue shadow-input-focus'
+                  ? 'border-corpiq-blue bg-corpiq-blue-50 text-corpiq-blue ring-2 ring-corpiq-blue/10'
                   : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
@@ -88,9 +88,9 @@ export function RegisterPage() {
             <button
               type="button"
               onClick={() => { setIsMember(false); setCardError(''); setCardNumber(''); }}
-              className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
+              className={`p-3 rounded-xl border text-sm font-semibold transition-all ${
                 isMember === false
-                  ? 'border-corpiq-blue bg-corpiq-blue-50 text-corpiq-blue shadow-input-focus'
+                  ? 'border-corpiq-blue bg-corpiq-blue-50 text-corpiq-blue ring-2 ring-corpiq-blue/10'
                   : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
@@ -106,7 +106,7 @@ export function RegisterPage() {
               placeholder="Ex: CORP-2024-XXXXX"
               value={cardNumber}
               onChange={(e) => { setCardNumber(e.target.value); setCardError(''); }}
-              icon={<CreditCard size={18} />}
+              icon={<CreditCard size={16} />}
               error={cardError}
               hint="Votre numéro figure sur votre carte membre ou dans votre courriel de bienvenue"
             />
@@ -120,7 +120,7 @@ export function RegisterPage() {
         )}
 
         <div className="pt-2">
-          <Button type="submit" fullWidth size="lg" disabled={isMember === null || step === 'validating'}>
+          <Button type="submit" fullWidth size="lg" disabled={isMember === null} loading={step === 'validating'}>
             {step === 'validating' ? 'Validation en cours...' : 'Créer mon compte'}
           </Button>
         </div>
@@ -128,10 +128,10 @@ export function RegisterPage() {
 
       <div className="relative my-8">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200" />
+          <div className="w-full border-t border-gray-100" />
         </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-white text-gray-500">ou continuer avec</span>
+        <div className="relative flex justify-center text-xs">
+          <span className="px-4 bg-corpiq-light text-gray-400 font-medium">ou continuer avec</span>
         </div>
       </div>
 
@@ -141,7 +141,7 @@ export function RegisterPage() {
         Déjà un compte ?{' '}
         <button
           onClick={() => navigate('/auth/login')}
-          className="font-medium text-corpiq-accent hover:text-corpiq-accent-light hover:underline underline-offset-2 transition-all"
+          className="font-semibold text-corpiq-accent hover:text-corpiq-accent-light transition-colors"
         >
           Se connecter
         </button>

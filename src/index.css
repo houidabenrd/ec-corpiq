@@ -8,20 +8,22 @@
 
 html {
   scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
 }
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f7f8fa;
-  color: #1a1a1a;
+  background-color: #f8f9fb;
+  color: #111827;
   margin: 0;
   padding: 0;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -29,24 +31,28 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.12);
+  background-color: rgba(0, 0, 0, 0.10);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.22);
+  background-color: rgba(0, 0, 0, 0.18);
 }
 
 input[type="checkbox"] {
   accent-color: #13315c;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
 }
 
 ::selection {
-  background-color: rgba(19, 49, 92, 0.15);
+  background-color: rgba(19, 49, 92, 0.12);
+  color: #13315c;
 }
 
 *:focus-visible {
-  outline: 2px solid rgba(19, 49, 92, 0.4);
+  outline: 2px solid rgba(19, 49, 92, 0.3);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -54,7 +60,7 @@ input[type="checkbox"] {
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {
-  outline: 2px solid rgba(19, 49, 92, 0.4);
+  outline: 2px solid rgba(19, 49, 92, 0.3);
   outline-offset: 2px;
 }
 
@@ -65,5 +71,21 @@ input:focus-visible {
   }
   .scrollbar-none::-webkit-scrollbar {
     display: none;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .glass-dark {
+    background: rgba(17, 24, 39, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 }

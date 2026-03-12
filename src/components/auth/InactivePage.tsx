@@ -11,22 +11,22 @@ export function InactivePage() {
       title="Compte désactivé"
       subtitle=""
     >
-      <div className="text-center space-y-6">
-        <div className="w-20 h-20 mx-auto bg-gray-100 rounded-2xl flex items-center justify-center">
-          <Ban size={36} className="text-gray-500" />
+      <div className="text-center space-y-6 animate-fade-in-up">
+        <div className="w-16 h-16 mx-auto bg-gray-50 rounded-2xl flex items-center justify-center">
+          <Ban size={28} className="text-gray-400" />
         </div>
 
         <div className="space-y-2">
-          <p className="text-gray-600 text-lg font-medium">
+          <p className="text-gray-700 text-base font-semibold">
             Votre compte a été désactivé
           </p>
-          <p className="text-gray-500">
+          <p className="text-gray-500 text-sm leading-relaxed">
             Veuillez contacter le support CORPIQ pour plus d'informations sur l'état de votre compte.
           </p>
         </div>
 
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-          <p className="text-sm text-gray-600">
+        <div className="bg-gray-50 border border-gray-100 rounded-xl p-4">
+          <p className="text-sm text-gray-500">
             Aucun accès aux modules n'est disponible lorsque le compte est désactivé.
           </p>
         </div>
@@ -35,7 +35,7 @@ export function InactivePage() {
           <Button
             fullWidth
             size="lg"
-            icon={<Headphones size={18} />}
+            icon={<Headphones size={16} />}
           >
             Contacter le support
           </Button>
@@ -43,7 +43,7 @@ export function InactivePage() {
             variant="ghost"
             fullWidth
             onClick={() => navigate('/auth/login')}
-            icon={<ArrowLeft size={16} />}
+            icon={<ArrowLeft size={15} />}
           >
             Retour à la connexion
           </Button>

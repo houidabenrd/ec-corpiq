@@ -21,7 +21,7 @@ export function SecuritySection() {
   return (
     <>
       <Card>
-        <CardHeader title="Sécurité & connexions" subtitle="Méthodes de connexion disponibles" />
+        <CardHeader title="Sécurité & connexions" subtitle="Méthodes de connexion disponibles" icon={<Key size={18} />} />
 
         {!scenario.has_password_auth && (
           <StatusBanner
@@ -42,11 +42,11 @@ export function SecuritySection() {
         <div className="space-y-3">
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-200">
-                <Key size={20} className="text-gray-600" />
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-gray-200 shadow-sm">
+                <Key size={18} className="text-gray-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Mot de passe</p>
+                <p className="text-sm font-semibold text-gray-900">Mot de passe</p>
                 <p className="text-xs text-gray-500">
                   {scenario.has_password_auth ? 'Mot de passe défini' : 'Aucun mot de passe'}
                 </p>
@@ -56,7 +56,7 @@ export function SecuritySection() {
               {scenario.has_password_auth ? (
                 <>
                   <Badge variant="success" dot>Actif</Badge>
-                  <Button variant="outline" size="sm">Changer mon mot de passe</Button>
+                  <Button variant="outline" size="sm">Changer</Button>
                 </>
               ) : (
                 <Badge variant="neutral">Non défini</Badge>
@@ -66,8 +66,8 @@ export function SecuritySection() {
 
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-200">
-                <svg width="20" height="20" viewBox="0 0 18 18">
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-gray-200 shadow-sm">
+                <svg width="18" height="18" viewBox="0 0 18 18">
                   <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
                   <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
                   <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
@@ -75,7 +75,7 @@ export function SecuritySection() {
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Google</p>
+                <p className="text-sm font-semibold text-gray-900">Google</p>
                 <p className="text-xs text-gray-500">{scenario.google_linked ? 'Compte lié' : 'Non lié'}</p>
               </div>
             </div>
@@ -86,7 +86,7 @@ export function SecuritySection() {
                   <Button
                     variant="outline"
                     size="sm"
-                    icon={<Link2Off size={14} />}
+                    icon={<Link2Off size={13} />}
                     disabled={isLastMethod}
                     onClick={() => setConfirmDisconnect('Google')}
                   >
@@ -96,7 +96,7 @@ export function SecuritySection() {
               ) : (
                 <>
                   <Badge variant="neutral">Non lié</Badge>
-                  <Button variant="outline" size="sm" icon={<Link2 size={14} />}>Associer Google</Button>
+                  <Button variant="outline" size="sm" icon={<Link2 size={13} />}>Associer</Button>
                 </>
               )}
             </div>
@@ -104,8 +104,8 @@ export function SecuritySection() {
 
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-200">
-                <svg width="20" height="20" viewBox="0 0 21 21">
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-gray-200 shadow-sm">
+                <svg width="18" height="18" viewBox="0 0 21 21">
                   <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
                   <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
                   <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
@@ -113,7 +113,7 @@ export function SecuritySection() {
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Microsoft</p>
+                <p className="text-sm font-semibold text-gray-900">Microsoft</p>
                 <p className="text-xs text-gray-500">{scenario.microsoft_linked ? 'Compte lié' : 'Non lié'}</p>
               </div>
             </div>
@@ -124,7 +124,7 @@ export function SecuritySection() {
                   <Button
                     variant="outline"
                     size="sm"
-                    icon={<Link2Off size={14} />}
+                    icon={<Link2Off size={13} />}
                     disabled={isLastMethod}
                     onClick={() => setConfirmDisconnect('Microsoft')}
                   >
@@ -134,7 +134,7 @@ export function SecuritySection() {
               ) : (
                 <>
                   <Badge variant="neutral">Non lié</Badge>
-                  <Button variant="outline" size="sm" icon={<Link2 size={14} />}>Associer Microsoft</Button>
+                  <Button variant="outline" size="sm" icon={<Link2 size={13} />}>Associer</Button>
                 </>
               )}
             </div>
@@ -149,7 +149,7 @@ export function SecuritySection() {
         size="sm"
       >
         <div className="space-y-4">
-          <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+          <div className="flex items-start gap-3 p-3.5 bg-amber-50 border border-amber-100 rounded-xl">
             <AlertTriangle size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-amber-800">
               Êtes-vous sûr de vouloir dissocier votre compte {confirmDisconnect} ?

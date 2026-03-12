@@ -5,9 +5,13 @@ export type MembershipState =
   | 'MEMBER_EXPIRED'
   | 'MEMBER_GRACE_PERIOD';
 
+export type UserRole = 'owner' | 'admin' | 'delegate';
+
 export interface UserScenario {
   membership_state: MembershipState;
   user_active: boolean;
+  role: UserRole;
+  /** @deprecated use role instead */
   is_primary_member: boolean;
   has_password_auth: boolean;
   google_linked: boolean;

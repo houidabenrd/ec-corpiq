@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Crown, CreditCard, Receipt, QrCode, ArrowRight, ArrowLeft, Check, Star,
-  AlertTriangle, Clock, ExternalLink, RefreshCw, Phone, Mail, Ban,
+  AlertTriangle, Clock, ExternalLink, RefreshCw, Phone, Mail, Ban, Lock,
   Building, ChevronRight, Sparkles, ShieldCheck, Gift, BookOpen, Headphones,
   Download, CheckCircle, XCircle, Minus, Plus as PlusIcon,
 } from 'lucide-react';
@@ -259,8 +259,10 @@ function NonMemberView() {
 // ─── ACTIVE MEMBER VIEW ──────────────────────────────────────
 function ActiveMemberView() {
   const navigate = useNavigate();
+  const { scenario } = useScenario();
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [contactModalOpen, setContactModalOpen] = useState(false);
+  const isOwner = scenario.role === 'owner';
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -316,7 +318,7 @@ function ActiveMemberView() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className={clsx('grid grid-cols-1 gap-6', isOwner && 'md:grid-cols-2')}>
         <Card>
           <CardHeader title="Renouvellement automatique" icon={<RefreshCw size={18} />} badge={<Badge variant="success" dot>Actif</Badge>} />
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 mb-3">
@@ -342,28 +344,41 @@ function ActiveMemberView() {
           </div>
         </Card>
 
-        <Card>
-          <CardHeader title="Moyen de paiement" icon={<CreditCard size={18} />} />
-          <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 mb-3">
-            <div className="w-14 h-9 bg-gradient-to-br from-[#1a1f71] to-[#2c3e9e] rounded-lg flex items-center justify-center shadow-sm">
-              <span className="text-white text-[10px] font-bold italic">VISA</span>
+        {isOwner ? (
+          <Card>
+            <CardHeader title="Moyen de paiement" icon={<CreditCard size={18} />} />
+            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 mb-3">
+              <div className="w-14 h-9 bg-gradient-to-br from-[#1a1f71] to-[#2c3e9e] rounded-lg flex items-center justify-center shadow-sm">
+                <span className="text-white text-[10px] font-bold italic">VISA</span>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-900">Visa •••• 4532</p>
+                <p className="text-xs text-gray-400">Expire 12/27</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-900">Visa •••• 4532</p>
-              <p className="text-xs text-gray-400">Expire 12/27</p>
-            </div>
-          </div>
-          <Button variant="outline" size="sm" fullWidth icon={<ExternalLink size={14} />} onClick={() => navigate('/profile')}>
-            Mettre à jour ma carte
-          </Button>
-          <p className="text-[11px] text-gray-400 mt-2 text-center">Modification via Profil → Facturation</p>
-
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <Button variant="outline" size="sm" fullWidth icon={<Receipt size={14} />} onClick={() => navigate('/factures')}>
-              Voir mes factures
+            <Button variant="outline" size="sm" fullWidth icon={<ExternalLink size={14} />} onClick={() => navigate('/profile')}>
+              Mettre à jour ma carte
             </Button>
-          </div>
-        </Card>
+            <p className="text-[11px] text-gray-400 mt-2 text-center">Modification via Profil → Facturation</p>
+
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <Button variant="outline" size="sm" fullWidth icon={<Receipt size={14} />} onClick={() => navigate('/factures')}>
+                Voir mes factures
+              </Button>
+            </div>
+          </Card>
+        ) : (
+          <Card>
+            <CardHeader title="Paiement & facturation" icon={<CreditCard size={18} />} />
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-center">
+              <Lock size={20} className="text-gray-300 mx-auto mb-2" />
+              <p className="text-sm font-semibold text-gray-500">Accès réservé au propriétaire</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Les informations de paiement et la facturation sont gérées par le membre principal de l'organisation.
+              </p>
+            </div>
+          </Card>
+        )}
       </div>
 
       <Modal open={qrModalOpen} onClose={() => setQrModalOpen(false)} title="QR Code — Carte membre" size="sm">
@@ -412,6 +427,9 @@ function Row({ label, value, mono }: { label: string; value: React.ReactNode; mo
 // ─── IN RENEWAL VIEW ─────────────────────────────────────────
 function InRenewalView() {
   const navigate = useNavigate();
+  const { scenario } = useScenario();
+  const isOwner = scenario.role === 'owner';
+
   return (
     <div className="space-y-6 animate-fade-in">
       <StatusBanner
@@ -431,33 +449,51 @@ function InRenewalView() {
         </div>
       </Card>
 
-      <Card>
-        <CardHeader title="Prochain prélèvement" icon={<CreditCard size={18} />} />
-        <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl space-y-2">
-          <Row label="Date du prélèvement" value="1er avril 2026" />
-          <Row label="Montant" value={<span className="text-lg font-bold text-amber-700">545 $</span>} />
-          <Row label="Carte utilisée" value="Visa •••• 4532" />
-        </div>
-        <p className="text-xs text-gray-400 mt-3 flex items-center gap-1.5">
-          <Mail size={12} />
-          Un courriel de rappel sera envoyé avant le prélèvement
-        </p>
-      </Card>
+      {isOwner ? (
+        <>
+          <Card>
+            <CardHeader title="Prochain prélèvement" icon={<CreditCard size={18} />} />
+            <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl space-y-2">
+              <Row label="Date du prélèvement" value="1er avril 2026" />
+              <Row label="Montant" value={<span className="text-lg font-bold text-amber-700">545 $</span>} />
+              <Row label="Carte utilisée" value="Visa •••• 4532" />
+            </div>
+            <p className="text-xs text-gray-400 mt-3 flex items-center gap-1.5">
+              <Mail size={12} />
+              Un courriel de rappel sera envoyé avant le prélèvement
+            </p>
+          </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Button fullWidth size="lg" icon={<RefreshCw size={16} />}>
-          Renouveler mon adhésion maintenant
-        </Button>
-        <Button variant="outline" fullWidth size="lg" icon={<Receipt size={16} />} onClick={() => navigate('/factures')}>
-          Voir mes factures
-        </Button>
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Button fullWidth size="lg" icon={<RefreshCw size={16} />}>
+              Renouveler mon adhésion maintenant
+            </Button>
+            <Button variant="outline" fullWidth size="lg" icon={<Receipt size={16} />} onClick={() => navigate('/factures')}>
+              Voir mes factures
+            </Button>
+          </div>
+        </>
+      ) : (
+        <Card>
+          <CardHeader title="Paiement & renouvellement" icon={<CreditCard size={18} />} />
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-center">
+            <Lock size={20} className="text-gray-300 mx-auto mb-2" />
+            <p className="text-sm font-semibold text-gray-500">Accès réservé au propriétaire</p>
+            <p className="text-xs text-gray-400 mt-1">
+              Le renouvellement et le paiement sont gérés par le membre principal de l'organisation.
+            </p>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
 
 // ─── GRACE PERIOD VIEW ───────────────────────────────────────
 function GracePeriodView() {
+  const { scenario } = useScenario();
+  const isOwner = scenario.role === 'owner';
+
   return (
     <div className="space-y-6 animate-fade-in">
       <StatusBanner
@@ -483,7 +519,7 @@ function GracePeriodView() {
                 <li className="flex items-center gap-1.5"><XCircle size={11} /> Outils premium — bloqués</li>
                 <li className="flex items-center gap-1.5"><XCircle size={11} /> Factures — bloquées</li>
                 <li className="flex items-center gap-1.5"><XCircle size={11} /> Avantages — bloqués</li>
-                <li className="flex items-center gap-1.5"><CheckCircle size={11} className="text-emerald-500" /> Paiement — autorisé</li>
+                <li className="flex items-center gap-1.5"><CheckCircle size={11} className="text-emerald-500" /> Paiement — autorisé (propriétaire)</li>
                 <li className="flex items-center gap-1.5"><CheckCircle size={11} className="text-emerald-500" /> Profil — autorisé</li>
                 <li className="flex items-center gap-1.5"><CheckCircle size={11} className="text-emerald-500" /> Support technique — autorisé</li>
               </ul>
@@ -491,12 +527,24 @@ function GracePeriodView() {
           </div>
         </div>
 
-        <Button fullWidth size="lg" icon={<CreditCard size={16} />}>
-          Régulariser mon paiement
-        </Button>
-        <p className="text-[11px] text-gray-400 mt-2 text-center flex items-center justify-center gap-1.5">
-          <ShieldCheck size={12} /> Redirection sécurisée vers Moneris
-        </p>
+        {isOwner ? (
+          <>
+            <Button fullWidth size="lg" icon={<CreditCard size={16} />}>
+              Régulariser mon paiement
+            </Button>
+            <p className="text-[11px] text-gray-400 mt-2 text-center flex items-center justify-center gap-1.5">
+              <ShieldCheck size={12} /> Redirection sécurisée vers Moneris
+            </p>
+          </>
+        ) : (
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-center">
+            <Lock size={20} className="text-gray-300 mx-auto mb-2" />
+            <p className="text-sm font-semibold text-gray-500">Paiement réservé au propriétaire</p>
+            <p className="text-xs text-gray-400 mt-1">
+              Contactez le membre principal de votre organisation pour régulariser le paiement.
+            </p>
+          </div>
+        )}
       </Card>
     </div>
   );
@@ -504,6 +552,8 @@ function GracePeriodView() {
 
 // ─── EXPIRED VIEW ────────────────────────────────────────────
 function ExpiredView() {
+  const { scenario } = useScenario();
+  const isOwner = scenario.role === 'owner';
   const [showBlockedModal, setShowBlockedModal] = useState(false);
   const daysSinceExpiry = 45;
   const isReadhesion = daysSinceExpiry > 90;
@@ -550,19 +600,29 @@ function ExpiredView() {
           </div>
         </div>
 
-        <div className="space-y-3">
-          <Button fullWidth size="lg" icon={isReadhesion ? <ArrowRight size={16} /> : <RefreshCw size={16} />}>
-            {isReadhesion ? 'Commencer la réadhésion' : 'Renouveler mon adhésion'}
-          </Button>
-
-          <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl">
-            <p className="text-xs font-semibold text-amber-800 mb-1">Réadhésion bloquée ?</p>
-            <p className="text-[11px] text-amber-600 mb-2">En cas de facture impayée, dossier en collection ou situation sensible, la réadhésion nécessite une validation humaine.</p>
-            <Button variant="outline" size="sm" fullWidth icon={<Headphones size={13} />} onClick={() => setShowBlockedModal(true)}>
-              Contacter le support
+        {isOwner ? (
+          <div className="space-y-3">
+            <Button fullWidth size="lg" icon={isReadhesion ? <ArrowRight size={16} /> : <RefreshCw size={16} />}>
+              {isReadhesion ? 'Commencer la réadhésion' : 'Renouveler mon adhésion'}
             </Button>
+
+            <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl">
+              <p className="text-xs font-semibold text-amber-800 mb-1">Réadhésion bloquée ?</p>
+              <p className="text-[11px] text-amber-600 mb-2">En cas de facture impayée, dossier en collection ou situation sensible, la réadhésion nécessite une validation humaine.</p>
+              <Button variant="outline" size="sm" fullWidth icon={<Headphones size={13} />} onClick={() => setShowBlockedModal(true)}>
+                Contacter le support
+              </Button>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-center">
+            <Lock size={20} className="text-gray-300 mx-auto mb-2" />
+            <p className="text-sm font-semibold text-gray-500">Paiement réservé au propriétaire</p>
+            <p className="text-xs text-gray-400 mt-1">
+              Le renouvellement ou la réadhésion doivent être effectués par le membre principal de l'organisation.
+            </p>
+          </div>
+        )}
       </Card>
 
       <Card>

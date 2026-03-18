@@ -93,6 +93,7 @@ function ExpiredDashboard() {
   const navigate = useNavigate();
   const { scenario } = useScenario();
   const isGrace = scenario.membership_state === 'MEMBER_GRACE_PERIOD';
+  const isOwner = scenario.role === 'owner';
 
   return (
     <div className="space-y-6">
@@ -110,18 +111,35 @@ function ExpiredDashboard() {
           <div className="w-14 h-14 mx-auto bg-red-50 rounded-2xl flex items-center justify-center mb-4">
             <CreditCard size={28} className="text-red-500" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
-            {isGrace ? 'Régularisez votre paiement' : 'Renouvelez votre adhésion'}
-          </h2>
-          <p className="text-sm text-gray-500 mb-6 max-w-md mx-auto">
-            {isGrace
-              ? 'Complétez votre paiement pour retrouver l\'accès complet à tous les services CORPIQ.'
-              : 'Votre adhésion a expiré. Renouvelez pour retrouver l\'accès aux outils premium, avantages et support juridique.'
-            }
-          </p>
-          <Button size="lg" icon={<ArrowRight size={16} />} onClick={() => navigate('/adhesion')}>
-            {isGrace ? 'Régulariser mon paiement' : 'Renouveler / Réadhérer'}
-          </Button>
+          {isOwner ? (
+            <>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">
+                {isGrace ? 'Régularisez votre paiement' : 'Renouvelez votre adhésion'}
+              </h2>
+              <p className="text-sm text-gray-500 mb-6 max-w-md mx-auto">
+                {isGrace
+                  ? 'Complétez votre paiement pour retrouver l\'accès complet à tous les services CORPIQ.'
+                  : 'Votre adhésion a expiré. Renouvelez pour retrouver l\'accès aux outils premium, avantages et support juridique.'
+                }
+              </p>
+              <Button size="lg" icon={<ArrowRight size={16} />} onClick={() => navigate('/adhesion')}>
+                {isGrace ? 'Régulariser mon paiement' : 'Renouveler / Réadhérer'}
+              </Button>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">
+                {isGrace ? 'Paiement en attente' : 'Adhésion expirée'}
+              </h2>
+              <p className="text-sm text-gray-500 mb-4 max-w-md mx-auto">
+                Le paiement et le renouvellement sont gérés par le membre principal (propriétaire) de votre organisation.
+              </p>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-lg text-xs font-medium text-gray-500">
+                <Lock size={12} />
+                Paiement réservé au propriétaire
+              </div>
+            </>
+          )}
         </div>
       </Card>
 
@@ -131,7 +149,7 @@ function ExpiredDashboard() {
           { label: 'Profil', desc: 'Gérer vos informations', icon: <UserCircle size={18} />, ok: true, path: '/profile' },
           { label: 'Support technique', desc: 'Aide et assistance', icon: <Headphones size={18} />, ok: true, path: '/support/technique' },
           { label: 'Outils publics', desc: isGrace ? 'Bloqué en période de grâce' : 'Accès aux outils de base', icon: <Wrench size={18} />, ok: !isGrace, path: '/outils' },
-          { label: 'Adhésion / Paiement', desc: 'Renouveler ou payer', icon: <Crown size={18} />, ok: true, path: '/adhesion' },
+          { label: 'Adhésion', desc: isOwner ? 'Renouveler ou payer' : 'Consulter le statut', icon: <Crown size={18} />, ok: true, path: '/adhesion' },
           { label: 'Outils premium', desc: 'Accès bloqué', icon: <Star size={18} />, ok: false },
           { label: 'Avantages & rabais', desc: 'Accès bloqué', icon: <Star size={18} />, ok: false },
           { label: 'Factures', desc: 'Accès bloqué', icon: <Receipt size={18} />, ok: false },

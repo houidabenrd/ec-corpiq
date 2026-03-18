@@ -23,7 +23,7 @@ import { Badge } from '../ui/Badge';
 import type { MembershipState, UserRole } from '../../types';
 
 type ItemState = 'visible' | 'grayed' | 'hidden';
-type StateMap = Record<'nonMember' | 'active' | 'delegate' | 'inProgress' | 'expired', ItemState>;
+type StateMap = Record<'nonMember' | 'active' | 'delegate' | 'inProgress' | 'expired' | 'grace', ItemState>;
 
 interface SubItem {
   id: string;
@@ -40,6 +40,7 @@ interface NavItem {
   states: StateMap;
   badge?: (state: MembershipState) => React.ReactNode | null;
   children?: SubItem[];
+  filterChildren?: (state: MembershipState) => string[] | undefined;
 }
 
 const navItems: NavItem[] = [
@@ -48,18 +49,19 @@ const navItems: NavItem[] = [
     label: 'Tableau de bord',
     icon: <LayoutDashboard size={18} />,
     path: '/dashboard',
-    states: { nonMember: 'visible', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'visible' },
+    states: { nonMember: 'visible', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'visible', grace: 'visible' },
   },
   {
     id: 'adhesion',
     label: 'Mon adhésion',
     icon: <Crown size={18} />,
     path: '/adhesion',
-    states: { nonMember: 'visible', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'visible' },
+    states: { nonMember: 'visible', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'visible', grace: 'visible' },
     badge: (s) =>
       s === 'NON_MEMBER' ? <Badge variant="info">Adhérer</Badge> :
       s === 'MEMBER_IN_PROGRESS' ? <Badge variant="warning" dot>En cours</Badge> :
-      s === 'MEMBER_EXPIRED' || s === 'MEMBER_GRACE_PERIOD' ? <Badge variant="danger" dot>Expiré</Badge> :
+      s === 'MEMBER_EXPIRED' ? <Badge variant="danger" dot>Expiré</Badge> :
+      s === 'MEMBER_GRACE_PERIOD' ? <Badge variant="danger" dot>Grâce</Badge> :
       null,
   },
   {
@@ -67,16 +69,16 @@ const navItems: NavItem[] = [
     label: 'Mes factures',
     icon: <Receipt size={18} />,
     path: '/factures',
-    states: { nonMember: 'hidden', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'hidden' },
+    states: { nonMember: 'hidden', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'hidden', grace: 'hidden' },
   },
   {
     id: 'outils',
     label: 'Mes outils',
     icon: <Wrench size={18} />,
     path: '/outils',
-    states: { nonMember: 'grayed', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'grayed' },
+    states: { nonMember: 'visible', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'visible', grace: 'hidden' },
     badge: (s) =>
-      s === 'NON_MEMBER' || s === 'MEMBER_EXPIRED' || s === 'MEMBER_GRACE_PERIOD'
+      s === 'NON_MEMBER' || s === 'MEMBER_EXPIRED'
         ? <Badge variant="neutral">Publics</Badge>
         : null,
   },
@@ -85,7 +87,7 @@ const navItems: NavItem[] = [
     label: 'Avantages',
     icon: <Star size={18} />,
     path: '/avantages',
-    states: { nonMember: 'hidden', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'hidden' },
+    states: { nonMember: 'hidden', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'hidden', grace: 'hidden' },
     children: [
       { id: 'rabais', label: 'Rabais partenaire', icon: <Percent size={15} />, path: '/avantages/rabais' },
       { id: 'calculateur', label: 'Calculateur de loyer', icon: <Calculator size={15} />, path: '/avantages/calculateur' },
@@ -97,7 +99,7 @@ const navItems: NavItem[] = [
     label: 'Événements & formations',
     icon: <Calendar size={18} />,
     path: '/evenements',
-    states: { nonMember: 'visible', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'visible' },
+    states: { nonMember: 'visible', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'visible', grace: 'hidden' },
     badge: () => <Badge variant="purple">À venir</Badge>,
   },
   {
@@ -105,17 +107,19 @@ const navItems: NavItem[] = [
     label: 'Support',
     icon: <Headphones size={18} />,
     path: '/support',
-    states: { nonMember: 'visible', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'visible' },
+    states: { nonMember: 'visible', active: 'visible', delegate: 'visible', inProgress: 'visible', expired: 'visible', grace: 'visible' },
     children: [
       { id: 'support-technique', label: 'Support technique', icon: <MonitorSmartphone size={15} />, path: '/support/technique' },
       { id: 'support-juridique', label: 'Support juridique', icon: <Scale size={15} />, path: '/support/juridique' },
     ],
+    filterChildren: (s) => s === 'NON_MEMBER' || s === 'MEMBER_GRACE_PERIOD' ? ['support-technique'] : undefined,
   },
 ];
 
 function getStateKey(membership: MembershipState, role: UserRole): keyof StateMap {
   if (membership === 'NON_MEMBER') return 'nonMember';
-  if (membership === 'MEMBER_EXPIRED' || membership === 'MEMBER_GRACE_PERIOD') return 'expired';
+  if (membership === 'MEMBER_GRACE_PERIOD') return 'grace';
+  if (membership === 'MEMBER_EXPIRED') return 'expired';
   if (membership === 'MEMBER_IN_PROGRESS') return 'inProgress';
   if (role === 'delegate') return 'delegate';
   return 'active';
@@ -261,7 +265,13 @@ export function Sidebar({ mobile = false, onClose }: SidebarProps) {
 
               {hasChildren && isOpen && !isGrayed && (
                 <div className="ml-5 pl-3 border-l-2 border-gray-100 mt-0.5 mb-1 space-y-0.5 animate-fade-in">
-                  {item.children!.map((child) => {
+                  {(item.filterChildren
+                    ? item.children!.filter(c => {
+                        const allowed = item.filterChildren!(scenario.membership_state);
+                        return !allowed || allowed.includes(c.id);
+                      })
+                    : item.children!
+                  ).map((child) => {
                     const isChildItemActive = location.pathname === child.path;
                     return (
                       <button

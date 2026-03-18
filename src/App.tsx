@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Crown, Receipt, Wrench, Star, Calendar, Headphones, Percent, Calculator, FileText, MonitorSmartphone, Scale } from 'lucide-react';
+import { Receipt, Wrench, Star, Calendar, Headphones, Percent, Calculator, FileText, MonitorSmartphone, Scale } from 'lucide-react';
 import { ScenarioProvider } from './context/ScenarioContext';
 import { ScenarioSwitcher } from './components/ScenarioSwitcher';
 import { LoginPage } from './components/auth/LoginPage';
@@ -10,6 +10,7 @@ import { CGUPage } from './components/auth/CGUPage';
 import { InactivePage } from './components/auth/InactivePage';
 import { Layout } from './components/layout/Layout';
 import { DashboardPage } from './pages/DashboardPage';
+import { AdhesionPage } from './pages/AdhesionPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { ProfilePage } from './components/profile/ProfilePage';
 import { PreferencesPage } from './pages/PreferencesPage';
@@ -33,7 +34,7 @@ export default function App() {
 
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/adhesion" element={<PlaceholderPage title="Mon adhésion" icon={<Crown size={28} />} />} />
+            <Route path="/adhesion" element={<AdhesionPage />} />
             <Route path="/factures" element={<PlaceholderPage title="Mes factures" icon={<Receipt size={28} />} />} />
             <Route path="/outils" element={<PlaceholderPage title="Mes outils" icon={<Wrench size={28} />} />} />
             <Route path="/avantages" element={<PlaceholderPage title="Avantages" icon={<Star size={28} />} />} />

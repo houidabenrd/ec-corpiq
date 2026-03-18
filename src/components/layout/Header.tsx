@@ -105,7 +105,7 @@ export function Header({ onToggleMobileMenu, mobileMenuOpen }: HeaderProps) {
                         Mon profil
                       </button>
                       <button
-                        onClick={() => navTo('/profile')}
+                        onClick={() => navTo('/profile?tab=preferences')}
                         className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all"
                       >
                         <Settings size={16} className="text-gray-400" />

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Save, Bell, Mail, Newspaper, Handshake, ShieldCheck, ExternalLink } from 'lucide-react';
+import { Save, Bell, Mail, Newspaper, Handshake, ShieldCheck, ExternalLink, FileCheck, Lock } from 'lucide-react';
 import { Card, CardHeader } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -125,7 +125,13 @@ export function PreferencesSection() {
       <Card>
         <CardHeader
           title="Conditions générales d'utilisation"
-          badge={<Badge variant="success">Acceptées</Badge>}
+          badge={
+            <div className="flex items-center gap-2">
+              <Badge variant="success">Acceptées</Badge>
+              <Badge variant="neutral">Lecture seule</Badge>
+            </div>
+          }
+          icon={<FileCheck size={18} />}
         />
         <div className="p-5 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-100">
           <div className="grid grid-cols-2 gap-6">
@@ -138,11 +144,15 @@ export function PreferencesSection() {
               <p className="text-lg text-gray-900 mt-1 font-bold">15 jan. 2026</p>
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
             <button className="text-sm text-corpiq-accent hover:text-corpiq-accent-light font-semibold transition-colors inline-flex items-center gap-1.5">
               Consulter les CGU complètes
               <ExternalLink size={13} />
             </button>
+            <p className="text-[11px] text-gray-400 flex items-center gap-1.5">
+              <Lock size={11} />
+              Non modifiable
+            </p>
           </div>
         </div>
       </Card>

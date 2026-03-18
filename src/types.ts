@@ -21,6 +21,7 @@ export interface UserScenario {
   billing_available: boolean;
   has_primary_card: boolean;
   has_secondary_card: boolean;
+  auto_renewal_active: boolean;
   ams_available: boolean;
   cgu_accepted: boolean;
 }

@@ -618,6 +618,20 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
   const [selectedAddress, setSelectedAddress] = useState<'org' | 'personal'>('org');
   const [cardRequested, setCardRequested] = useState(false);
   const isOwner = scenario.role === 'owner';
+  const hasAutoRenewal = scenario.auto_renewal_active;
+  const hasCard = scenario.has_primary_card;
+
+  // ── Activation flow state (for members without auto-renewal) ──
+  const [activationStep, setActivationStep] = useState<'idle' | 'card' | 'contract' | 'success'>('idle');
+  const [actCardNumber, setActCardNumber] = useState('');
+  const [actCardName, setActCardName] = useState('');
+  const [actCardExpiry, setActCardExpiry] = useState('');
+  const [actCardCvv, setActCardCvv] = useState('');
+  const [actContractAccepted, setActContractAccepted] = useState(false);
+  const [actAuthDebit, setActAuthDebit] = useState(false);
+  const [actAuthRenewal, setActAuthRenewal] = useState(false);
+
+  const actCardValid = actCardNumber.replace(/\s/g, '').length >= 15 && actCardName.length > 2 && actCardExpiry.length >= 4 && actCardCvv.length >= 3;
 
   const statusBadge = isRenewal
     ? <Badge variant="warning" dot>En renouvellement</Badge>
@@ -720,65 +734,135 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
       <div className={clsx('grid grid-cols-1 gap-6', isOwner && 'md:grid-cols-2')}>
         {/* ── Renouvellement auto ── */}
         <Card className="group hover:shadow-card-hover transition-shadow duration-300">
-          <CardHeader title="Renouvellement automatique" icon={<RefreshCw size={18} />} badge={<Badge variant="success" dot>Durée indéterminée</Badge>} />
-          <div className="space-y-1 mb-4">
-            <Row label="Type" value={<span className="text-corpiq-blue font-bold">Durée indéterminée</span>} />
-            <Row label="Renouvellement auto" value={
-              <div className="flex items-center gap-2">
-                <span className="text-emerald-600 font-semibold text-xs">Activé</span>
-                <div className="w-9 h-5 bg-emerald-500 rounded-full relative cursor-not-allowed">
-                  <span className="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-md transition-all" />
+          {hasAutoRenewal ? (
+            <>
+              <CardHeader title="Renouvellement automatique" icon={<RefreshCw size={18} />} badge={<Badge variant="success" dot>Durée indéterminée</Badge>} />
+              <div className="space-y-1 mb-4">
+                <Row label="Type" value={<span className="text-corpiq-blue font-bold">Durée indéterminée</span>} />
+                <Row label="Renouvellement auto" value={
+                  <div className="flex items-center gap-2">
+                    <span className="text-emerald-600 font-semibold text-xs">Activé</span>
+                    <div className="w-9 h-5 bg-emerald-500 rounded-full relative cursor-not-allowed">
+                      <span className="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-md transition-all" />
+                    </div>
+                  </div>
+                } />
+                <Row label="Date anniversaire" value={<span className="text-corpiq-blue font-bold">15 mars 2028</span>} />
+                <Row label="Prochain prélèvement" value={isRenewal ? '1er avril 2026' : '15 mars 2028'} />
+                <Row label="Préavis d'ajustement" value="30 à 60 jours avant la date anniversaire" />
+              </div>
+              <div className="p-3.5 bg-blue-50/80 border border-blue-100 rounded-xl flex items-start gap-2.5 mb-3">
+                <Info size={14} className="text-blue-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-semibold text-blue-800">Renouvellement à durée indéterminée</p>
+                  <p className="text-[11px] text-blue-600 mt-0.5 leading-relaxed">Votre adhésion est renouvelée automatiquement chaque année à la date anniversaire. La CORPIQ vous informera par avis écrit au moins 1 mois avant la date de prélèvement du montant de la cotisation applicable et de toute modification tarifaire.</p>
                 </div>
               </div>
-            } />
-            <Row label="Date anniversaire" value={<span className="text-corpiq-blue font-bold">15 mars 2028</span>} />
-            <Row label="Prochain prélèvement" value={isRenewal ? '1er avril 2026' : '15 mars 2028'} />
-            <Row label="Préavis d'ajustement" value="30 à 60 jours avant la date anniversaire" />
-          </div>
-          <div className="p-3.5 bg-blue-50/80 border border-blue-100 rounded-xl flex items-start gap-2.5 mb-3">
-            <Info size={14} className="text-blue-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-xs font-semibold text-blue-800">Renouvellement à durée indéterminée</p>
-              <p className="text-[11px] text-blue-600 mt-0.5 leading-relaxed">Votre adhésion est renouvelée automatiquement chaque année à la date anniversaire. La CORPIQ vous informera par avis écrit au moins 1 mois avant la date de prélèvement du montant de la cotisation applicable et de toute modification tarifaire.</p>
-            </div>
-          </div>
-          <div className="p-3.5 bg-amber-50/80 border border-amber-100 rounded-xl flex items-start gap-2.5 mb-3">
-            <Info size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-xs font-semibold text-amber-800">Résiliation</p>
-              <p className="text-[11px] text-amber-600 mt-0.5 leading-relaxed">Pour ne pas renouveler, avisez la CORPIQ par écrit avant la prochaine date anniversaire. Contactez votre chargé de compte pour toute demande.</p>
-            </div>
-          </div>
-          <Button variant="outline" size="sm" fullWidth icon={<Headphones size={14} />} onClick={() => setContactModalOpen(true)}>
-            Contacter mon chargé de compte
-          </Button>
+              <div className="p-3.5 bg-amber-50/80 border border-amber-100 rounded-xl flex items-start gap-2.5 mb-3">
+                <Info size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-semibold text-amber-800">Résiliation</p>
+                  <p className="text-[11px] text-amber-600 mt-0.5 leading-relaxed">Pour ne pas renouveler, avisez la CORPIQ par écrit avant la prochaine date anniversaire. Contactez votre chargé de compte pour toute demande.</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" fullWidth icon={<Headphones size={14} />} onClick={() => setContactModalOpen(true)}>
+                Contacter mon chargé de compte
+              </Button>
+            </>
+          ) : (
+            <>
+              <CardHeader title="Renouvellement automatique" icon={<RefreshCw size={18} />} badge={<Badge variant="danger" dot>Inactif</Badge>} />
+              <div className="space-y-1 mb-4">
+                <Row label="Renouvellement auto" value={
+                  <div className="flex items-center gap-2">
+                    <span className="text-red-500 font-semibold text-xs">Désactivé</span>
+                    <div className="w-9 h-5 bg-gray-300 rounded-full relative cursor-pointer" onClick={() => isOwner && setActivationStep('card')}>
+                      <span className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-md transition-all" />
+                    </div>
+                  </div>
+                } />
+                <Row label="Date de fin" value={<span className="text-red-500 font-bold">15 mars 2028</span>} />
+                <Row label="Carte de crédit" value={hasCard ? 'Visa •••• 4532' : <span className="text-red-500 font-semibold">Aucune carte enregistrée</span>} />
+              </div>
+
+              <div className="p-3.5 bg-red-50/80 border border-red-100 rounded-xl flex items-start gap-2.5 mb-3">
+                <AlertTriangle size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-semibold text-red-800">Renouvellement automatique non activé</p>
+                  <p className="text-[11px] text-red-600 mt-0.5 leading-relaxed">Votre adhésion prendra fin à la date d'échéance sans renouvellement. Pour activer le renouvellement automatique à durée indéterminée, vous devez enregistrer une carte de crédit et accepter le contrat de renouvellement.</p>
+                </div>
+              </div>
+
+              {!hasCard && (
+                <div className="p-3.5 bg-amber-50/80 border border-amber-100 rounded-xl flex items-start gap-2.5 mb-3">
+                  <CreditCard size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs font-semibold text-amber-800">Aucune carte bancaire</p>
+                    <p className="text-[11px] text-amber-600 mt-0.5 leading-relaxed">Vous devez d'abord ajouter une carte de crédit pour activer le renouvellement automatique.</p>
+                  </div>
+                </div>
+              )}
+
+              {isOwner ? (
+                <Button fullWidth size="sm" icon={<Zap size={14} />} onClick={() => setActivationStep('card')} className="shadow-sm">
+                  Activer le renouvellement automatique
+                </Button>
+              ) : (
+                <div className="p-3 bg-gray-50 rounded-xl text-center">
+                  <p className="text-xs text-gray-500">L'activation du renouvellement est réservée au <strong>propriétaire</strong>.</p>
+                </div>
+              )}
+            </>
+          )}
         </Card>
 
         {/* ── Paiement (owner only) ── */}
         {isOwner ? (
-          <Card className="group hover:shadow-card-hover transition-shadow duration-300">
-            <CardHeader title="Moyen de paiement" icon={<Wallet size={18} />} />
-            <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100 mb-4">
-              <div className="w-16 h-10 bg-gradient-to-br from-[#1a1f71] to-[#2c3e9e] rounded-lg flex items-center justify-center shadow-md">
-                <span className="text-white text-[11px] font-bold italic tracking-wide">VISA</span>
+          hasCard ? (
+            <Card className="group hover:shadow-card-hover transition-shadow duration-300">
+              <CardHeader title="Moyen de paiement" icon={<Wallet size={18} />} />
+              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100 mb-4">
+                <div className="w-16 h-10 bg-gradient-to-br from-[#1a1f71] to-[#2c3e9e] rounded-lg flex items-center justify-center shadow-md">
+                  <span className="text-white text-[11px] font-bold italic tracking-wide">VISA</span>
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-gray-900">Visa •••• 4532</p>
+                  <p className="text-xs text-gray-400">Expire 12/27</p>
+                </div>
+                <Badge variant="success" className="ml-auto">Valide</Badge>
               </div>
-              <div>
-                <p className="text-sm font-bold text-gray-900">Visa •••• 4532</p>
-                <p className="text-xs text-gray-400">Expire 12/27</p>
-              </div>
-              <Badge variant="success" className="ml-auto">Valide</Badge>
-            </div>
-            <Button variant="outline" size="sm" fullWidth icon={<ExternalLink size={14} />} onClick={() => navigate('/profile')}>
-              Mettre à jour ma carte
-            </Button>
-            <p className="text-[11px] text-gray-400 mt-2 text-center">Modification via Profil → Facturation</p>
-
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              <Button variant="outline" size="sm" fullWidth icon={<Receipt size={14} />} onClick={() => navigate('/factures')}>
-                Voir mes factures
+              <Button variant="outline" size="sm" fullWidth icon={<ExternalLink size={14} />} onClick={() => navigate('/profile')}>
+                Mettre à jour ma carte
               </Button>
-            </div>
-          </Card>
+              <p className="text-[11px] text-gray-400 mt-2 text-center">Modification via Profil → Facturation</p>
+
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <Button variant="outline" size="sm" fullWidth icon={<Receipt size={14} />} onClick={() => navigate('/factures')}>
+                  Voir mes factures
+                </Button>
+              </div>
+            </Card>
+          ) : (
+            <Card className="group hover:shadow-card-hover transition-shadow duration-300">
+              <CardHeader title="Moyen de paiement" icon={<Wallet size={18} />} badge={<Badge variant="danger">Aucune carte</Badge>} />
+              <div className="p-6 bg-gradient-to-br from-red-50/50 to-white rounded-xl border border-red-100 text-center mb-4">
+                <div className="w-14 h-14 mx-auto bg-red-100 rounded-2xl flex items-center justify-center mb-3">
+                  <CreditCard size={24} className="text-red-400" />
+                </div>
+                <p className="text-sm font-bold text-gray-700 mb-1">Aucune carte enregistrée</p>
+                <p className="text-xs text-gray-400 leading-relaxed max-w-xs mx-auto">Vous devez enregistrer une carte de crédit pour activer le renouvellement automatique de votre adhésion.</p>
+              </div>
+              <Button fullWidth size="sm" icon={<CreditCard size={14} />} onClick={() => setActivationStep('card')} className="shadow-sm">
+                Ajouter une carte de crédit
+              </Button>
+
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <Button variant="outline" size="sm" fullWidth icon={<Receipt size={14} />} onClick={() => navigate('/factures')}>
+                  Voir mes factures
+                </Button>
+              </div>
+            </Card>
+          )
         ) : (
           <Card>
             <CardHeader title="Paiement & facturation" icon={<CreditCard size={18} />} />
@@ -994,6 +1078,189 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
             Télécharger le contrat (PDF)
           </Button>
         </div>
+      </Modal>
+
+      {/* ── Modal: Activation renouvellement automatique (flow carte → contrat → succès) ── */}
+      <Modal
+        open={activationStep !== 'idle'}
+        onClose={() => { setActivationStep('idle'); setActContractAccepted(false); setActAuthDebit(false); setActAuthRenewal(false); }}
+        title={
+          activationStep === 'card' ? 'Étape 1 — Carte de crédit' :
+          activationStep === 'contract' ? 'Étape 2 — Contrat de renouvellement' :
+          activationStep === 'success' ? 'Renouvellement activé' : ''
+        }
+        size="md"
+      >
+        {activationStep === 'card' && (
+          <div className="space-y-5 animate-fade-in">
+            <StepIndicator current={1} total={2} />
+            <p className="text-sm text-gray-500">Pour activer le renouvellement automatique, veuillez d'abord enregistrer une carte de crédit valide.</p>
+
+            {/* Card preview */}
+            <div className="relative rounded-2xl bg-gradient-to-br from-[#1a1f71] via-[#2c3e9e] to-[#1a1f71] p-5 text-white shadow-xl overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/40">Carte de crédit</span>
+                <span className="text-sm font-bold italic tracking-wide text-white/80">{actCardNumber.startsWith('5') ? 'MASTERCARD' : 'VISA'}</span>
+              </div>
+              <p className="font-mono text-lg tracking-[0.15em] mb-3">{actCardNumber || '•••• •••• •••• ••••'}</p>
+              <div className="flex justify-between text-xs">
+                <div><p className="text-white/40 text-[9px] uppercase">Titulaire</p><p className="font-semibold">{actCardName || '—'}</p></div>
+                <div className="text-right"><p className="text-white/40 text-[9px] uppercase">Expire</p><p className="font-semibold">{actCardExpiry || 'MM/AA'}</p></div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3">
+              <Input label="Numéro de carte" placeholder="1234 5678 9012 3456" value={actCardNumber} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setActCardNumber(e.target.value)} />
+              <Input label="Titulaire de la carte" placeholder="Nom complet" value={actCardName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setActCardName(e.target.value)} />
+              <div className="grid grid-cols-2 gap-3">
+                <Input label="Expiration" placeholder="MM/AA" value={actCardExpiry} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setActCardExpiry(e.target.value)} />
+                <Input label="CVV" placeholder="123" type="password" value={actCardCvv} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setActCardCvv(e.target.value)} />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-gray-400 justify-center">
+              <ShieldCheck size={13} />
+              <span>Paiement sécurisé via Moneris</span>
+            </div>
+
+            <Button
+              fullWidth
+              size="lg"
+              onClick={() => actCardValid && setActivationStep('contract')}
+              icon={<ArrowRight size={16} />}
+              className={clsx('shadow-lg transition-all', actCardValid ? 'hover:shadow-xl' : 'opacity-50 cursor-not-allowed')}
+            >
+              Continuer vers le contrat
+            </Button>
+
+            {!actCardValid && (
+              <p className="text-[11px] text-center text-gray-400">Veuillez remplir tous les champs de la carte.</p>
+            )}
+          </div>
+        )}
+
+        {activationStep === 'contract' && (
+          <div className="space-y-5 animate-fade-in">
+            <StepIndicator current={2} total={2} />
+            <p className="text-sm text-gray-500">Lisez et acceptez le contrat de renouvellement automatique pour finaliser l'activation.</p>
+
+            {/* Contract text */}
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 max-h-[220px] overflow-y-auto scrollbar-thin text-xs text-gray-600 leading-relaxed space-y-3">
+              <p className="font-bold text-gray-800 text-sm">Contrat de renouvellement automatique CORPIQ</p>
+
+              <div>
+                <p className="font-bold text-gray-800">Objet</p>
+                <p>Le présent contrat encadre l'activation du renouvellement automatique à durée indéterminée de l'adhésion du Membre à la CORPIQ.</p>
+              </div>
+
+              <div>
+                <p className="font-bold text-gray-800">Renouvellement à durée indéterminée</p>
+                <p className="mb-1">À l'expiration de la période initiale d'adhésion, l'adhésion sera renouvelée automatiquement <strong>pour une durée indéterminée</strong>. La cotisation applicable sera facturée annuellement à la date anniversaire du renouvellement, conformément au tarif en vigueur.</p>
+                <p className="mb-1">La CORPIQ transmettra au Membre un avis écrit entre le 90<sup>e</sup> et le 60<sup>e</sup> jour précédant l'expiration initiale, puis <strong>au moins 1 mois</strong> avant chaque date anniversaire, l'informant du montant de la cotisation et de la date du prélèvement.</p>
+                <p>Le Membre peut résilier en avisant la CORPIQ par écrit avant la prochaine date anniversaire.</p>
+              </div>
+
+              <div>
+                <p className="font-bold text-gray-800">Ajustement tarifaire</p>
+                <p>Le montant de la cotisation peut être modifié lors du renouvellement. Le Membre sera informé de tout ajustement au moins 30 jours avant la date de prélèvement.</p>
+              </div>
+
+              <div>
+                <p className="font-bold text-gray-800">Carte de paiement</p>
+                <p>La carte de crédit fournie sera enregistrée dans l'espace membre et servira pour les prélèvements de renouvellement. Le Membre doit maintenir des informations de paiement valides et à jour.</p>
+              </div>
+
+              <p className="text-gray-400 italic pt-2 border-t border-gray-200">Document contractuel — Version mars 2026</p>
+            </div>
+
+            {/* Contract acceptance */}
+            <label className="flex items-start gap-3 cursor-pointer group p-4 bg-white rounded-xl border-2 border-gray-200 hover:border-corpiq-blue transition-colors">
+              <div className="relative mt-0.5">
+                <input type="checkbox" checked={actContractAccepted} onChange={(e) => setActContractAccepted(e.target.checked)} className="sr-only" />
+                <div className={clsx('w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center', actContractAccepted ? 'border-corpiq-blue bg-corpiq-blue' : 'border-gray-300')}>
+                  {actContractAccepted && <Check size={12} className="text-white" />}
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-900 group-hover:text-corpiq-blue transition-colors">J'ai lu et j'accepte le contrat de renouvellement automatique</p>
+                <p className="text-xs text-gray-400 mt-0.5">Obligatoire pour activer le renouvellement</p>
+              </div>
+            </label>
+
+            {/* Authorization checkboxes */}
+            <div className="space-y-3">
+              <label className="flex items-start gap-3 cursor-pointer group p-3 rounded-xl border-2 border-gray-200 hover:border-corpiq-blue/30 transition-all">
+                <div className="relative mt-0.5 flex-shrink-0">
+                  <input type="checkbox" checked={actAuthDebit} onChange={(e) => setActAuthDebit(e.target.checked)} className="sr-only" />
+                  <div className={clsx('w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center', actAuthDebit ? 'border-corpiq-blue bg-corpiq-blue' : 'border-gray-300')}>
+                    {actAuthDebit && <Check size={12} className="text-white" />}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-700 leading-relaxed">
+                  J'autorise la CORPIQ à enregistrer les informations bancaires fournies dans mon espace membre et à les utiliser pour les prélèvements de renouvellement.
+                </p>
+              </label>
+
+              <label className="flex items-start gap-3 cursor-pointer group p-3 rounded-xl border-2 border-gray-200 hover:border-corpiq-blue/30 transition-all">
+                <div className="relative mt-0.5 flex-shrink-0">
+                  <input type="checkbox" checked={actAuthRenewal} onChange={(e) => setActAuthRenewal(e.target.checked)} className="sr-only" />
+                  <div className={clsx('w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center', actAuthRenewal ? 'border-corpiq-blue bg-corpiq-blue' : 'border-gray-300')}>
+                    {actAuthRenewal && <Check size={12} className="text-white" />}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-700 leading-relaxed">
+                  J'autorise la CORPIQ à débiter automatiquement ma carte de crédit à chaque date anniversaire du renouvellement, <strong>pour une durée indéterminée</strong>, pour le paiement de la cotisation annuelle applicable incluant les taxes. Je serai informé(e) par avis écrit au moins 1 mois avant chaque prélèvement.
+                </p>
+              </label>
+            </div>
+
+            <div className="flex gap-3">
+              <Button variant="outline" fullWidth onClick={() => setActivationStep('card')} icon={<ArrowLeft size={14} />}>
+                Retour
+              </Button>
+              <Button
+                fullWidth
+                size="lg"
+                onClick={() => actContractAccepted && actAuthDebit && actAuthRenewal && setActivationStep('success')}
+                icon={<Check size={16} />}
+                className={clsx('shadow-lg transition-all', (actContractAccepted && actAuthDebit && actAuthRenewal) ? 'hover:shadow-xl' : 'opacity-50 cursor-not-allowed')}
+              >
+                Activer
+              </Button>
+            </div>
+
+            {!(actContractAccepted && actAuthDebit && actAuthRenewal) && (
+              <p className="text-[11px] text-center text-gray-400">
+                {!actContractAccepted && 'Acceptez le contrat. '}
+                {(!actAuthDebit || !actAuthRenewal) && 'Les deux autorisations sont obligatoires.'}
+              </p>
+            )}
+          </div>
+        )}
+
+        {activationStep === 'success' && (
+          <div className="text-center py-8 animate-fade-in">
+            <div className="relative w-20 h-20 mx-auto mb-6">
+              <div className="absolute inset-0 bg-emerald-200/30 rounded-3xl animate-ping" />
+              <div className="relative w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl flex items-center justify-center shadow-lg">
+                <CheckCircle size={36} className="text-white" />
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Renouvellement activé !</h3>
+            <p className="text-sm text-gray-500 leading-relaxed max-w-sm mx-auto mb-6">
+              Votre carte de crédit a été enregistrée et le renouvellement automatique à durée indéterminée est maintenant actif. Vous recevrez un avis écrit au moins 1 mois avant chaque prélèvement.
+            </p>
+            <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-left space-y-1 mb-4">
+              <Row label="Carte enregistrée" value={`•••• ${actCardNumber.slice(-4)}`} />
+              <Row label="Renouvellement" value={<Badge variant="success" dot>Durée indéterminée</Badge>} />
+              <Row label="Prochaine date anniversaire" value="15 mars 2028" />
+            </div>
+            <Button fullWidth onClick={() => setActivationStep('idle')} icon={<Check size={14} />}>
+              Terminé
+            </Button>
+          </div>
+        )}
       </Modal>
     </div>
   );

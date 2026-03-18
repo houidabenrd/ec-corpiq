@@ -105,10 +105,13 @@ export function Header({ onToggleMobileMenu, mobileMenuOpen }: HeaderProps) {
                         Mon profil
                       </button>
                       <button
-                        onClick={() => navTo('/profile?tab=preferences')}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all"
+                        onClick={() => navTo('/preferences')}
+                        className={clsx(
+                          'w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-xl transition-all',
+                          location.pathname === '/preferences' ? 'text-corpiq-blue bg-corpiq-blue-50 font-semibold' : 'text-gray-700 hover:bg-gray-50'
+                        )}
                       >
-                        <Settings size={16} className="text-gray-400" />
+                        <Settings size={16} className={location.pathname === '/preferences' ? 'text-corpiq-blue' : 'text-gray-400'} />
                         Préférences
                       </button>
                     </div>

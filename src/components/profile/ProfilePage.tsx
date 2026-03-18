@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ArrowLeft, Building, Shield, Bell, CreditCard, User } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '../ui/Badge';
 import { useScenario } from '../../context/ScenarioContext';
 import { ContactSection } from './ContactSection';
@@ -41,24 +41,8 @@ const tabs: { id: Tab; label: string; icon: React.ReactNode; requiresOwner?: boo
 
 export function ProfilePage() {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
   const { scenario } = useScenario();
-
-  const tabParam = searchParams.get('tab') as Tab | null;
-  const validTabs: Tab[] = ['contact', 'security', 'preferences', 'billing'];
-  const initialTab = tabParam && validTabs.includes(tabParam) ? tabParam : 'contact';
-  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
-
-  useEffect(() => {
-    if (tabParam && validTabs.includes(tabParam) && tabParam !== activeTab) {
-      setActiveTab(tabParam);
-    }
-  }, [tabParam]);
-
-  function handleTabChange(tab: Tab) {
-    setActiveTab(tab);
-    setSearchParams({ tab });
-  }
+  const [activeTab, setActiveTab] = useState<Tab>('contact');
 
   const isOwner = scenario.role === 'owner';
   const showBilling = scenario.billing_available && isOwner;
@@ -115,7 +99,7 @@ export function ProfilePage() {
         {visibleTabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => handleTabChange(tab.id)}
+            onClick={() => setActiveTab(tab.id)}
             className={clsx(
               'flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap',
               activeTab === tab.id

@@ -12,6 +12,7 @@ import { Layout } from './components/layout/Layout';
 import { DashboardPage } from './pages/DashboardPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { ProfilePage } from './components/profile/ProfilePage';
+import { PreferencesPage } from './pages/PreferencesPage';
 import { PrototypeHub } from './pages/PrototypeHub';
 
 export default function App() {
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/support/technique" element={<PlaceholderPage title="Support technique" icon={<MonitorSmartphone size={28} />} />} />
             <Route path="/support/juridique" element={<PlaceholderPage title="Support juridique" icon={<Scale size={28} />} />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/preferences" element={<PreferencesPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

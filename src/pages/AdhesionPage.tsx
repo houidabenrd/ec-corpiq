@@ -5,7 +5,7 @@ import {
   AlertTriangle, Clock, ExternalLink, RefreshCw, Phone, Mail, Ban, Lock,
   Building, ChevronRight, Sparkles, ShieldCheck, Gift, BookOpen, Headphones,
   Download, CheckCircle, XCircle, Minus, Plus as PlusIcon, MapPin, User,
-  CalendarClock, Wallet, Info, Zap, Timer, UserCheck,
+  CalendarClock, Wallet, Info, Zap, Timer, UserCheck, FileText, Eye,
 } from 'lucide-react';
 import { useScenario } from '../context/ScenarioContext';
 import { Card, CardHeader } from '../components/ui/Card';
@@ -337,6 +337,7 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [physicalCardModalOpen, setPhysicalCardModalOpen] = useState(false);
+  const [contractOpen, setContractOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<'org' | 'personal'>('org');
   const [cardRequested, setCardRequested] = useState(false);
   const isOwner = scenario.role === 'owner';
@@ -367,6 +368,34 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
             <Row label="Statut" value={isRenewal ? <Badge variant="warning" dot>En renouvellement</Badge> : <Badge variant="success">Membre actif</Badge>} />
             <Row label="Offre" value="2 ans — Premium" />
             <Row label="Date de fin" value="15 mars 2028" />
+          </div>
+
+          {/* ── Contrat d'adhésion ── */}
+          <div className="mt-5 pt-5 border-t border-gray-100">
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100">
+              <div className="w-10 h-10 bg-corpiq-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <FileText size={18} className="text-corpiq-blue" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-gray-900">Contrat d'adhésion</p>
+                <p className="text-xs text-gray-400 mt-0.5">Contrat CORPIQ — 2 ans Premium · Signé le 15 mars 2026</p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button
+                  onClick={() => setContractOpen(true)}
+                  className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-400 hover:text-corpiq-blue hover:border-corpiq-blue-100 hover:bg-corpiq-blue-50/50 transition-all"
+                  title="Consulter"
+                >
+                  <Eye size={15} />
+                </button>
+                <button
+                  className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-400 hover:text-corpiq-blue hover:border-corpiq-blue-100 hover:bg-corpiq-blue-50/50 transition-all"
+                  title="Télécharger PDF"
+                >
+                  <Download size={15} />
+                </button>
+              </div>
+            </div>
           </div>
         </Card>
 
@@ -467,15 +496,18 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
         ) : (
           <Card>
             <CardHeader title="Paiement & facturation" icon={<CreditCard size={18} />} />
-            <div className="p-6 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-100 text-center">
+            <div className="p-5 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-100 text-center mb-4">
               <div className="w-12 h-12 mx-auto bg-gray-100 rounded-xl flex items-center justify-center mb-3">
                 <Lock size={20} className="text-gray-300" />
               </div>
-              <p className="text-sm font-bold text-gray-500">Accès réservé au propriétaire</p>
+              <p className="text-sm font-bold text-gray-500">Carte bancaire réservée au propriétaire</p>
               <p className="text-xs text-gray-400 mt-1.5 leading-relaxed max-w-xs mx-auto">
-                Les informations de paiement et la facturation sont gérées par le membre principal de l'organisation.
+                La gestion de la carte de paiement est réservée au membre principal.
               </p>
             </div>
+            <Button variant="outline" size="sm" fullWidth icon={<Receipt size={14} />} onClick={() => navigate('/factures')}>
+              Voir mes factures
+            </Button>
           </Card>
         )}
       </div>
@@ -600,6 +632,73 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
             </Button>
           </div>
         )}
+      </Modal>
+
+      <Modal open={contractOpen} onClose={() => setContractOpen(false)} title="Contrat d'adhésion" size="lg">
+        <div className="space-y-5">
+          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-corpiq-blue-50 to-white rounded-xl border border-corpiq-blue-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-corpiq-blue rounded-xl flex items-center justify-center">
+                <FileText size={18} className="text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-900">Contrat CORPIQ — 2 ans Premium</p>
+                <p className="text-xs text-gray-400">Signé le 15 mars 2026 · PDF · 2 pages</p>
+              </div>
+            </div>
+            <Badge variant="info">Lecture seule</Badge>
+          </div>
+
+          <div className="p-5 bg-gray-50 rounded-xl border border-gray-100 max-h-[400px] overflow-y-auto scrollbar-thin">
+            <h4 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Contrat d'adhésion CORPIQ</h4>
+
+            <div className="space-y-4 text-xs text-gray-600 leading-relaxed">
+              <div>
+                <p className="font-bold text-gray-800 mb-1">Article 1 — Parties</p>
+                <p>Le présent contrat est conclu entre la Corporation des propriétaires immobiliers du Québec (CORPIQ) et le membre identifié ci-dessous :</p>
+                <div className="mt-2 p-3 bg-white rounded-lg border border-gray-100 space-y-1">
+                  <p><span className="text-gray-400">Nom :</span> <span className="font-semibold text-gray-900">Jean Tremblay</span></p>
+                  <p><span className="text-gray-400">N° membre :</span> <span className="font-mono font-semibold text-gray-900">CORP-2026-04521</span></p>
+                  <p><span className="text-gray-400">Organisation :</span> <span className="font-semibold text-gray-900">Immeubles Tremblay Inc.</span></p>
+                </div>
+              </div>
+
+              <div>
+                <p className="font-bold text-gray-800 mb-1">Article 2 — Durée et tarif</p>
+                <p>L'adhésion est consentie pour une durée de <strong>2 ans</strong>, soit du <strong>15 mars 2026</strong> au <strong>15 mars 2028</strong>, au tarif de <strong>545 $</strong> (incluant les frais d'ouverture de dossier de 50 $).</p>
+              </div>
+
+              <div>
+                <p className="font-bold text-gray-800 mb-1">Article 3 — Services inclus</p>
+                <ul className="list-disc ml-4 space-y-1">
+                  <li>Accès aux outils de gestion immobilière</li>
+                  <li>Calculateur de loyer et modèles de lettres</li>
+                  <li>Rabais partenaires et avantages exclusifs</li>
+                  <li>Support technique et juridique</li>
+                  <li>Consultation juridique gratuite (offre Premium)</li>
+                </ul>
+              </div>
+
+              <div>
+                <p className="font-bold text-gray-800 mb-1">Article 4 — Renouvellement</p>
+                <p>L'adhésion se renouvelle automatiquement à la date d'échéance, sauf avis contraire communiqué au chargé de compte au moins 30 jours avant la date de fin.</p>
+              </div>
+
+              <div>
+                <p className="font-bold text-gray-800 mb-1">Article 5 — Résiliation</p>
+                <p>Le membre peut résilier son adhésion en contactant son chargé de compte. Aucun remboursement n'est accordé pour la période restante. En cas de non-renouvellement au-delà de 90 jours après expiration, une réadhésion complète avec frais de dossier sera requise.</p>
+              </div>
+
+              <div className="pt-3 border-t border-gray-200">
+                <p className="text-gray-400 italic">Document généré automatiquement — Version du contrat : mars 2026</p>
+              </div>
+            </div>
+          </div>
+
+          <Button fullWidth variant="outline" icon={<Download size={15} />}>
+            Télécharger le contrat (PDF)
+          </Button>
+        </div>
       </Modal>
     </div>
   );

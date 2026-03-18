@@ -99,10 +99,10 @@ function ExpiredDashboard() {
     <div className="space-y-6">
       <StatusBanner
         variant="error"
-        title={isGrace ? 'Période de grâce' : 'Adhésion expirée'}
+        title={isGrace ? 'Période de grâce — 0 à 90 jours après l\'échéance' : 'Adhésion expirée — Plus de 90 jours'}
         message={isGrace
-          ? 'Votre paiement doit être régularisé. Accès limité au paiement, profil et support technique.'
-          : 'Votre adhésion est expirée. Renouvelez ou réadhérez pour retrouver l\'accès complet.'
+          ? 'Votre adhésion a atteint sa date d\'échéance. Renouvelez dans les 90 jours. La nouvelle date anniversaire sera la date du paiement.'
+          : 'La période de grâce de 90 jours est terminée. Une réadhésion complète avec frais d\'ouverture de dossier (50 $) est requise.'
         }
       />
 
@@ -114,25 +114,28 @@ function ExpiredDashboard() {
           {isOwner ? (
             <>
               <h2 className="text-xl font-bold text-gray-900 mb-2">
-                {isGrace ? 'Régularisez votre paiement' : 'Renouvelez votre adhésion'}
+                {isGrace ? 'Renouvelez votre adhésion' : 'Réadhésion requise'}
               </h2>
               <p className="text-sm text-gray-500 mb-6 max-w-md mx-auto">
                 {isGrace
-                  ? 'Complétez votre paiement pour retrouver l\'accès complet à tous les services CORPIQ.'
-                  : 'Votre adhésion a expiré. Renouvelez pour retrouver l\'accès aux outils premium, avantages et support juridique.'
+                  ? 'Renouvelez maintenant pour conserver votre adhésion. Votre nouvelle date anniversaire sera la date du paiement.'
+                  : 'La période de grâce est terminée. Effectuez une réadhésion complète (offre + frais d\'ouverture de dossier de 50 $).'
                 }
               </p>
               <Button size="lg" icon={<ArrowRight size={16} />} onClick={() => navigate('/adhesion')}>
-                {isGrace ? 'Régulariser mon paiement' : 'Renouveler / Réadhérer'}
+                {isGrace ? 'Renouveler maintenant' : 'Commencer la réadhésion'}
               </Button>
             </>
           ) : (
             <>
               <h2 className="text-xl font-bold text-gray-900 mb-2">
-                {isGrace ? 'Paiement en attente' : 'Adhésion expirée'}
+                {isGrace ? 'Renouvellement en attente' : 'Réadhésion requise'}
               </h2>
               <p className="text-sm text-gray-500 mb-4 max-w-md mx-auto">
-                Le paiement et le renouvellement sont gérés par le membre principal (propriétaire) de votre organisation.
+                {isGrace
+                  ? 'Le renouvellement est géré par le membre principal (propriétaire) de votre organisation.'
+                  : 'La réadhésion doit être effectuée par le membre principal (propriétaire) de votre organisation.'
+                }
               </p>
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-lg text-xs font-medium text-gray-500">
                 <Lock size={12} />
@@ -149,7 +152,7 @@ function ExpiredDashboard() {
           { label: 'Profil', desc: 'Gérer vos informations', icon: <UserCircle size={18} />, ok: true, path: '/profile' },
           { label: 'Support technique', desc: 'Aide et assistance', icon: <Headphones size={18} />, ok: true, path: '/support/technique' },
           { label: 'Outils publics', desc: isGrace ? 'Bloqué en période de grâce' : 'Accès aux outils de base', icon: <Wrench size={18} />, ok: !isGrace, path: '/outils' },
-          { label: 'Adhésion', desc: isOwner ? 'Renouveler ou payer' : 'Consulter le statut', icon: <Crown size={18} />, ok: true, path: '/adhesion' },
+          { label: 'Adhésion', desc: isOwner ? (isGrace ? 'Renouveler maintenant' : 'Réadhérer') : 'Consulter le statut', icon: <Crown size={18} />, ok: true, path: '/adhesion' },
           { label: 'Outils premium', desc: 'Accès bloqué', icon: <Star size={18} />, ok: false },
           { label: 'Avantages & rabais', desc: 'Accès bloqué', icon: <Star size={18} />, ok: false },
           { label: 'Factures', desc: 'Accès bloqué', icon: <Receipt size={18} />, ok: false },

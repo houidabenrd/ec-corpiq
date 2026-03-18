@@ -113,7 +113,7 @@ export const scenarioPresets: ScenarioPreset[] = [
   },
   {
     label: 'En renouvellement',
-    description: 'Renouvellement en cours, accès complet maintenu',
+    description: 'Avant 60j d\'échéance, renouvelle à la date anniversaire',
     color: 'bg-yellow-500',
     scenario: {
       membership_state: 'MEMBER_IN_PROGRESS',
@@ -135,7 +135,7 @@ export const scenarioPresets: ScenarioPreset[] = [
   },
   {
     label: 'Expiré',
-    description: 'Adhésion expirée, accès restreint',
+    description: 'Après 90j post-expiration, réadhésion + frais dossier',
     color: 'bg-red-500',
     scenario: {
       membership_state: 'MEMBER_EXPIRED',
@@ -157,7 +157,7 @@ export const scenarioPresets: ScenarioPreset[] = [
   },
   {
     label: 'Période de grâce',
-    description: 'Période de grâce, même comportement qu\'expiré',
+    description: 'Entre échéance et +90j, renouvelle à la date du paiement',
     color: 'bg-orange-500',
     scenario: {
       membership_state: 'MEMBER_GRACE_PERIOD',

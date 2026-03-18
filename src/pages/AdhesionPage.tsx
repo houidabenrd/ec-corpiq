@@ -642,8 +642,8 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
       {isRenewal && (
         <StatusBanner
           variant="warning"
-          title="Renouvellement en cours"
-          message="Votre adhésion arrive bientôt à échéance. Votre accès complet est maintenu pendant le processus."
+          title="Renouvellement en cours — Moins de 60 jours avant l'échéance"
+          message="Votre adhésion arrive à échéance le 15 mars 2028. Le renouvellement sera effectué automatiquement à cette date anniversaire. Votre accès complet est maintenu."
         />
       )}
 
@@ -748,7 +748,8 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
                   </div>
                 } />
                 <Row label="Date anniversaire" value={<span className="text-corpiq-blue font-bold">15 mars 2028</span>} />
-                <Row label="Prochain prélèvement" value={isRenewal ? '1er avril 2026' : '15 mars 2028'} />
+                <Row label="Prochain prélèvement" value={<span className="text-corpiq-blue font-bold">15 mars 2028</span>} />
+                <Row label="Date de facturation" value={<span className="text-corpiq-blue font-bold">15 mars 2028</span>} />
                 <Row label="Préavis d'ajustement" value="30 à 60 jours avant la date anniversaire" />
               </div>
               <div className="p-3.5 bg-blue-50/80 border border-blue-100 rounded-xl flex items-start gap-2.5 mb-3">
@@ -885,11 +886,16 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
       {/* ── Renewal-specific: payment details (owner only) ── */}
       {isRenewal && isOwner && (
         <Card className="border-amber-100 bg-gradient-to-br from-amber-50/30 to-white animate-fade-in">
-          <CardHeader title="Prochain prélèvement" icon={<CalendarClock size={18} />} badge={<Badge variant="warning">Prélèvement à venir</Badge>} />
+          <CardHeader title="Prochain prélèvement — Date anniversaire" icon={<CalendarClock size={18} />} badge={<Badge variant="warning">Prélèvement à venir</Badge>} />
           <div className="p-4 bg-amber-50/60 border border-amber-100 rounded-xl space-y-1 mb-4">
-            <Row label="Date du prélèvement" value={<span className="font-bold text-amber-800">1er avril 2026</span>} />
-            <Row label="Montant" value={<span className="text-xl font-bold text-amber-700">545 $</span>} />
+            <Row label="Date anniversaire / prélèvement" value={<span className="font-bold text-amber-800">15 mars 2028</span>} />
+            <Row label="Date de facturation" value={<span className="font-bold text-amber-800">15 mars 2028</span>} />
+            <Row label="Montant estimé" value={<span className="text-xl font-bold text-amber-700">495 $</span>} />
             <Row label="Carte utilisée" value="Visa •••• 4532" />
+          </div>
+          <div className="p-3.5 bg-blue-50/80 border border-blue-100 rounded-xl flex items-start gap-2.5 mb-4">
+            <Info size={14} className="text-blue-600 mt-0.5 flex-shrink-0" />
+            <p className="text-[11px] text-blue-600 leading-relaxed">Le prélèvement sera effectué automatiquement à la date anniversaire. Un avis écrit vous sera transmis au moins 1 mois avant avec le montant applicable.</p>
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-400 mb-4">
             <Mail size={13} />
@@ -897,7 +903,7 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Button fullWidth size="lg" icon={<RefreshCw size={16} />} className="shadow-md">
-              Renouveler maintenant
+              Renouveler maintenant (à la date anniversaire)
             </Button>
             <Button variant="outline" fullWidth size="lg" icon={<Receipt size={16} />} onClick={() => navigate('/factures')}>
               Voir mes factures
@@ -1275,17 +1281,33 @@ function GracePeriodView() {
     <div className="space-y-6 animate-fade-in">
       <StatusBanner
         variant="error"
-        title="Période de grâce — Action requise"
-        message="Votre paiement doit être régularisé. L'accès est limité au paiement, profil et support technique uniquement."
+        title="Période de grâce — Entre la date d'échéance et 90 jours"
+        message="Votre adhésion a atteint sa date d'échéance. Vous disposez de 90 jours pour renouveler. Passé ce délai, une réadhésion complète avec frais d'ouverture de dossier sera requise."
       />
 
       <Card className="overflow-hidden">
-        <CardHeader title="Régularisation requise" icon={<Timer size={18} />} badge={<Badge variant="danger" dot>Urgent</Badge>} />
+        <CardHeader title="Renouvellement requis" icon={<Timer size={18} />} badge={<Badge variant="danger" dot>Période de grâce</Badge>} />
         <div className="space-y-1 mb-5">
           <Row label="N° membre" value="CORP-2026-04521" mono />
           <Row label="Rôle" value={getRoleBadge(scenario.role)} />
-          <Row label="Date d'expiration" value="15 mars 2026" />
+          <Row label="Date d'échéance" value={<span className="text-red-600 font-bold">15 mars 2026</span>} />
+          <Row label="Fin de la période de grâce" value={<span className="text-red-600 font-bold">13 juin 2026</span>} />
           <Row label="Statut" value={<Badge variant="danger">Période de grâce</Badge>} />
+        </div>
+
+        {/* Info: renewal at payment date */}
+        <div className="p-4 bg-blue-50/80 border border-blue-100 rounded-xl mb-4">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Info size={16} className="text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-blue-900">Renouvellement à la date du paiement</p>
+              <p className="text-xs text-blue-700 mt-1 leading-relaxed">
+                En période de grâce, votre nouvelle date anniversaire sera <strong>la date à laquelle vous effectuez le paiement</strong> (et non l'ancienne date d'échéance). La cotisation sera ensuite facturée annuellement à cette nouvelle date.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Warning about consequences */}
@@ -1295,9 +1317,9 @@ function GracePeriodView() {
               <AlertTriangle size={16} className="text-amber-600" />
             </div>
             <div>
-              <p className="text-sm font-bold text-amber-900">Attention — Délai limité</p>
+              <p className="text-sm font-bold text-amber-900">Attention — Délai limité (90 jours)</p>
               <p className="text-xs text-amber-700 mt-1 leading-relaxed">
-                Si vous ne renouvelez pas maintenant, votre adhésion passera en statut <strong>expiré</strong> et nécessitera une <strong>réadhésion complète</strong> avec des <strong>frais d'ouverture de dossier de 50 $</strong>.
+                Si vous ne renouvelez pas avant le <strong>13 juin 2026</strong>, votre adhésion passera en statut <strong>expiré</strong> et nécessitera une <strong>réadhésion complète</strong> avec des <strong>frais d'ouverture de dossier de 50 $</strong>.
               </p>
             </div>
           </div>
@@ -1332,10 +1354,10 @@ function GracePeriodView() {
         {isOwner ? (
           <>
             <Button fullWidth size="lg" icon={<CreditCard size={16} />} className="shadow-lg hover:shadow-xl transition-shadow">
-              Régulariser mon paiement maintenant
+              Renouveler maintenant
             </Button>
             <p className="text-[11px] text-gray-400 mt-2.5 text-center flex items-center justify-center gap-1.5">
-              <ShieldCheck size={12} /> Redirection sécurisée vers Moneris
+              <ShieldCheck size={12} /> Votre nouvelle date anniversaire sera la date du paiement
             </p>
           </>
         ) : (
@@ -1359,64 +1381,64 @@ function ExpiredView() {
   const { scenario } = useScenario();
   const isOwner = scenario.role === 'owner';
   const [showBlockedModal, setShowBlockedModal] = useState(false);
-  const daysSinceExpiry = 45;
-  const isReadhesion = daysSinceExpiry > 90;
 
   return (
     <div className="space-y-6 animate-fade-in">
       <StatusBanner
         variant="error"
-        title="Adhésion expirée"
-        message={isReadhesion
-          ? 'Votre adhésion a expiré depuis plus de 90 jours. Un parcours de réadhésion est nécessaire.'
-          : `Votre adhésion a expiré il y a ${daysSinceExpiry} jours. Renouvelez maintenant pour éviter des frais supplémentaires.`
-        }
+        title="Adhésion expirée — Plus de 90 jours après l'échéance"
+        message="Votre période de grâce de 90 jours est terminée. Vous devez effectuer une réadhésion complète avec frais d'ouverture de dossier pour redevenir membre."
       />
 
       <Card className="overflow-hidden">
         <CardHeader
-          title={isReadhesion ? 'Réadhésion requise' : 'Renouvellement'}
+          title="Réadhésion requise"
           icon={<Crown size={18} />}
-          badge={<Badge variant="danger" dot>Expiré · {daysSinceExpiry}j</Badge>}
+          badge={<Badge variant="danger" dot>Expiré</Badge>}
         />
         <div className="space-y-1 mb-5">
           <Row label="N° membre" value="CORP-2026-04521" mono />
           <Row label="Rôle" value={getRoleBadge(scenario.role)} />
-          <Row label="Date d'expiration" value="25 janvier 2026" />
-          <Row label="Jours depuis expiration" value={<span className="font-bold text-red-600">{daysSinceExpiry} jours</span>} />
-          <Row label="Type" value={isReadhesion ? <Badge variant="danger">Réadhésion</Badge> : <Badge variant="warning">Renouvellement</Badge>} />
+          <Row label="Date d'échéance initiale" value="15 décembre 2025" />
+          <Row label="Fin de la période de grâce" value="15 mars 2026" />
+          <Row label="Statut" value={<Badge variant="danger">Expiré — Réadhésion requise</Badge>} />
         </div>
 
         {/* Frais de dossier notice */}
-        <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl mb-4">
+        <div className="p-4 bg-gradient-to-r from-red-50 to-orange-50 border border-red-100 rounded-xl mb-4">
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Receipt size={16} className="text-blue-600" />
+            <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Receipt size={16} className="text-red-600" />
             </div>
             <div>
-              <p className="text-sm font-bold text-blue-900">Frais applicables</p>
-              <p className="text-xs text-blue-700 mt-1 leading-relaxed">
-                {isReadhesion
-                  ? 'La réadhésion inclut le prix de l\'offre choisie + les frais d\'ouverture de dossier de 50 $.'
-                  : 'Le renouvellement inclut le prix de votre offre actuelle + les frais de renouvellement de dossier de 50 $.'}
+              <p className="text-sm font-bold text-red-900">Réadhésion + Frais d'ouverture de dossier</p>
+              <p className="text-xs text-red-700 mt-1 leading-relaxed">
+                La réadhésion inclut le prix de l'offre choisie (1, 2 ou 3 ans) + les <strong>frais d'ouverture de dossier de 50 $</strong>. Le renouvellement simple n'est plus possible après la fin de la période de grâce.
               </p>
             </div>
           </div>
         </div>
 
+        {/* Timeline */}
         <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 mb-5">
-          <p className="text-xs font-bold text-gray-700 mb-3">Règle de délai</p>
+          <p className="text-xs font-bold text-gray-700 mb-3">Chronologie des statuts</p>
           <div className="space-y-2.5">
             <div className="flex items-center gap-3">
-              <div className={clsx('w-2.5 h-2.5 rounded-full ring-2 transition-all', daysSinceExpiry <= 90 ? 'bg-amber-500 ring-amber-200' : 'bg-gray-300 ring-gray-200')} />
-              <p className={clsx('text-xs leading-relaxed', daysSinceExpiry <= 90 ? 'text-gray-900 font-semibold' : 'text-gray-400')}>
-                ≤ 90 jours — Renouvellement + frais de dossier (50 $)
+              <div className="w-2.5 h-2.5 rounded-full ring-2 bg-gray-300 ring-gray-200" />
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Avant 60j d'échéance — <strong>En renouvellement</strong> (renouvelle à la date anniversaire)
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <div className={clsx('w-2.5 h-2.5 rounded-full ring-2 transition-all', daysSinceExpiry > 90 ? 'bg-red-500 ring-red-200' : 'bg-gray-300 ring-gray-200')} />
-              <p className={clsx('text-xs leading-relaxed', daysSinceExpiry > 90 ? 'text-gray-900 font-semibold' : 'text-gray-400')}>
-                {'>'} 90 jours — Réadhésion complète + frais de dossier (50 $)
+              <div className="w-2.5 h-2.5 rounded-full ring-2 bg-gray-300 ring-gray-200" />
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Échéance → +90 jours — <strong>Période de grâce</strong> (renouvelle à la date du paiement)
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-2.5 h-2.5 rounded-full ring-2 bg-red-500 ring-red-200" />
+              <p className="text-xs text-gray-900 font-semibold leading-relaxed">
+                Après 90 jours — <strong>Expiré</strong> → Réadhésion complète + frais de dossier (50 $)
               </p>
             </div>
           </div>
@@ -1424,8 +1446,8 @@ function ExpiredView() {
 
         {isOwner ? (
           <div className="space-y-3">
-            <Button fullWidth size="lg" icon={isReadhesion ? <ArrowRight size={16} /> : <RefreshCw size={16} />} className="shadow-lg hover:shadow-xl transition-shadow">
-              {isReadhesion ? 'Commencer la réadhésion' : 'Renouveler mon adhésion'}
+            <Button fullWidth size="lg" icon={<ArrowRight size={16} />} className="shadow-lg hover:shadow-xl transition-shadow">
+              Commencer la réadhésion
             </Button>
 
             <div className="p-3.5 bg-amber-50/80 border border-amber-100 rounded-xl">
@@ -1441,9 +1463,9 @@ function ExpiredView() {
             <div className="w-12 h-12 mx-auto bg-gray-100 rounded-xl flex items-center justify-center mb-3">
               <Lock size={20} className="text-gray-300" />
             </div>
-            <p className="text-sm font-bold text-gray-500">Paiement réservé au propriétaire</p>
+            <p className="text-sm font-bold text-gray-500">Réadhésion réservée au propriétaire</p>
             <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">
-              Le renouvellement ou la réadhésion doivent être effectués par le membre principal de l'organisation.
+              La réadhésion doit être effectuée par le membre principal de l'organisation.
             </p>
           </div>
         )}
@@ -1566,9 +1588,9 @@ export function AdhesionPage() {
   const subtitles: Record<string, string> = {
     NON_MEMBER: 'Découvrez nos offres et adhérez à CORPIQ',
     MEMBER_ACTIVE: 'Gérez votre adhésion et votre carte membre',
-    MEMBER_IN_PROGRESS: 'Votre renouvellement est en cours',
-    MEMBER_GRACE_PERIOD: 'Régularisez votre paiement',
-    MEMBER_EXPIRED: 'Renouvelez pour retrouver vos accès',
+    MEMBER_IN_PROGRESS: 'Moins de 60 jours avant l\'échéance — Renouvellement à la date anniversaire',
+    MEMBER_GRACE_PERIOD: 'Entre l\'échéance et 90 jours — Renouvellement à la date du paiement',
+    MEMBER_EXPIRED: 'Plus de 90 jours après l\'échéance — Réadhésion requise',
   };
 
   return (

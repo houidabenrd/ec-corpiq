@@ -84,10 +84,29 @@ function Row({ label, value, mono }: { label: string; value: React.ReactNode; mo
 }
 
 // ─── NON-MEMBER: ADHESION TUNNEL ─────────────────────────────
+function StepIndicator({ current, total }: { current: number; total: number }) {
+  return (
+    <div className="flex items-center gap-2 mb-3">
+      <div className="flex gap-1">
+        {Array.from({ length: total }).map((_, i) => (
+          <div key={i} className={clsx('h-1.5 rounded-full transition-all duration-500', i < current ? 'w-8 bg-corpiq-blue' : 'w-4 bg-gray-200')} />
+        ))}
+      </div>
+      <span className="text-xs text-gray-400 ml-2">Étape {current} / {total}</span>
+    </div>
+  );
+}
+
 function NonMemberView() {
-  const [step, setStep] = useState<'units' | 'offers' | 'tunnel' | 'success'>('units');
+  const [step, setStep] = useState<'units' | 'offers' | 'contract' | 'payment' | 'success'>('units');
   const [nbUnits, setNbUnits] = useState(1);
   const [selectedOffer, setSelectedOffer] = useState<string | null>(null);
+  const [contractAccepted, setContractAccepted] = useState(false);
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvc, setCardCvc] = useState('');
+  const [cardName, setCardName] = useState('Jean Tremblay');
+  const [saveCard, setSaveCard] = useState(true);
   const { setPresetIndex } = useScenario();
   const navigate = useNavigate();
 
@@ -112,11 +131,20 @@ function NonMemberView() {
         </div>
         <h2 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">Bienvenue chez CORPIQ !</h2>
         <p className="text-gray-500 mb-8 leading-relaxed max-w-sm mx-auto">Votre adhésion est maintenant active. Un courriel de confirmation vous a été envoyé avec vos informations de membre et votre contrat.</p>
-        <div className="p-5 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 text-left space-y-3 mb-8 shadow-sm">
+        <div className="p-5 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 text-left space-y-3 mb-6 shadow-sm">
           <Row label="Membre" value="Jean Tremblay" />
           <Row label="N° membre" value="CORP-2026-04521" mono />
           <Row label="N° carte" value="4521-7890-1234" mono />
           <Row label="Offre" value={offers.find(o => o.id === selectedOffer)?.duration} />
+        </div>
+        <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl mb-8 text-left">
+          <div className="flex items-start gap-3">
+            <CreditCard size={16} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-bold text-emerald-800">Carte enregistrée dans votre profil</p>
+              <p className="text-[11px] text-emerald-600 mt-0.5">Votre carte de paiement a été sauvegardée et sera utilisée pour les prochains renouvellements. Vous pouvez la gérer dans Profil → Facturation.</p>
+            </div>
+          </div>
         </div>
         <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
           <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
@@ -126,26 +154,20 @@ function NonMemberView() {
     );
   }
 
-  if (step === 'tunnel') {
+  // ── STEP 4: Payment ──
+  if (step === 'payment') {
     const offer = offers.find(o => o.id === selectedOffer)!;
+    const cardValid = cardNumber.length >= 16 && cardExpiry.length >= 4 && cardCvc.length >= 3;
+
     return (
       <div className="max-w-lg mx-auto animate-fade-in">
-        <button onClick={() => setStep('offers')} className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-corpiq-blue transition-colors mb-6 group">
-          <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" /> Retour aux offres
+        <button onClick={() => setStep('contract')} className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-corpiq-blue transition-colors mb-6 group">
+          <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" /> Retour au contrat
         </button>
 
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="flex gap-1">
-              {[1, 2, 3].map(s => (
-                <div key={s} className={clsx('h-1.5 rounded-full transition-all duration-500', s <= 3 ? 'w-8 bg-corpiq-blue' : 'w-4 bg-gray-200')} />
-              ))}
-            </div>
-            <span className="text-xs text-gray-400 ml-2">Étape 3 / 3</span>
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Finaliser votre adhésion</h2>
-          <p className="text-sm text-gray-500">Offre {offer.duration} — {offer.current} $</p>
-        </div>
+        <StepIndicator current={4} total={4} />
+        <h2 className="text-xl font-bold text-gray-900 mb-1">Paiement sécurisé</h2>
+        <p className="text-sm text-gray-500 mb-8">Offre {offer.duration} — Total : <span className="font-bold text-corpiq-blue">{offer.current + 50} $</span></p>
 
         <Card className="mb-4 overflow-hidden">
           <CardHeader title="Récapitulatif" icon={<Receipt size={18} />} />
@@ -160,30 +182,200 @@ function NonMemberView() {
         </Card>
 
         <Card className="mb-4">
-          <CardHeader title="Vos informations" icon={<Building size={18} />} />
+          <CardHeader title="Carte de crédit" icon={<CreditCard size={18} />} />
+
+          {/* Simulated card preview */}
+          <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800 via-gray-900 to-black p-5 text-white mb-5 shadow-lg">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-6">
+                <div className="w-10 h-7 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-md" />
+                <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Credit</span>
+              </div>
+              <p className="font-mono text-lg tracking-[0.2em] mb-4">
+                {cardNumber ? cardNumber.replace(/(.{4})/g, '$1 ').trim() : '•••• •••• •••• ••••'}
+              </p>
+              <div className="flex justify-between">
+                <div>
+                  <p className="text-[9px] uppercase tracking-widest text-white/30">Titulaire</p>
+                  <p className="text-sm font-semibold">{cardName || '—'}</p>
+                </div>
+                <div>
+                  <p className="text-[9px] uppercase tracking-widest text-white/30">Expire</p>
+                  <p className="text-sm font-semibold font-mono">{cardExpiry || '••/••'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-3">
+            <Input
+              label="Numéro de carte"
+              placeholder="1234 5678 9012 3456"
+              value={cardNumber}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCardNumber(e.target.value.replace(/\D/g, '').slice(0, 16))}
+              icon={<CreditCard size={16} />}
+            />
+            <Input
+              label="Titulaire de la carte"
+              value={cardName}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCardName(e.target.value)}
+              icon={<User size={16} />}
+            />
             <div className="grid grid-cols-2 gap-3">
-              <Input label="Prénom" defaultValue="Jean" readOnly />
-              <Input label="Nom" defaultValue="Tremblay" readOnly />
+              <Input
+                label="Expiration"
+                placeholder="MM/AA"
+                value={cardExpiry}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCardExpiry(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              />
+              <Input
+                label="CVC"
+                placeholder="123"
+                value={cardCvc}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              />
             </div>
-            <Input label="Courriel" defaultValue="jean.tremblay@email.com" readOnly icon={<Mail size={16} />} />
-            <Input label="Nombre de logements" value={String(nbUnits)} readOnly />
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <label className="flex items-start gap-3 cursor-pointer group">
+              <div className="relative mt-0.5">
+                <input type="checkbox" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} className="sr-only peer" />
+                <div className="w-5 h-5 rounded-md border-2 border-gray-300 peer-checked:border-corpiq-blue peer-checked:bg-corpiq-blue transition-all flex items-center justify-center">
+                  {saveCard && <Check size={12} className="text-white" />}
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">Enregistrer cette carte dans mon profil</p>
+                <p className="text-xs text-gray-400 mt-0.5">Sera utilisée pour les prochains renouvellements automatiques</p>
+              </div>
+            </label>
           </div>
         </Card>
 
-        <Card className="mb-6">
-          <CardHeader title="Paiement" icon={<CreditCard size={18} />} />
-          <div className="p-5 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-100 text-center">
-            <div className="w-12 h-12 mx-auto bg-gradient-to-br from-corpiq-blue/10 to-corpiq-blue/5 rounded-xl flex items-center justify-center mb-3">
-              <ShieldCheck size={22} className="text-corpiq-blue" />
-            </div>
-            <p className="text-sm font-medium text-gray-700 mb-1">Redirection vers Moneris</p>
-            <p className="text-xs text-gray-400">Paiement 100% sécurisé — Aucune donnée stockée</p>
+        <div className="flex items-center gap-2 text-xs text-gray-400 mb-4 justify-center">
+          <ShieldCheck size={13} />
+          <span>Paiement sécurisé via Moneris — Aucune donnée stockée sur nos serveurs</span>
+        </div>
+
+        <Button
+          fullWidth
+          size="lg"
+          onClick={handlePayment}
+          icon={<CreditCard size={16} />}
+          className={clsx('shadow-lg transition-all', cardValid ? 'hover:shadow-xl' : 'opacity-60 cursor-not-allowed')}
+        >
+          Payer {offer.current + 50} $ et adhérer
+        </Button>
+      </div>
+    );
+  }
+
+  // ── STEP 3: Contract acceptance ──
+  if (step === 'contract') {
+    const offer = offers.find(o => o.id === selectedOffer)!;
+
+    return (
+      <div className="max-w-lg mx-auto animate-fade-in">
+        <button onClick={() => setStep('offers')} className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-corpiq-blue transition-colors mb-6 group">
+          <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" /> Retour aux offres
+        </button>
+
+        <StepIndicator current={3} total={4} />
+        <h2 className="text-xl font-bold text-gray-900 mb-1">Contrat d'adhésion</h2>
+        <p className="text-sm text-gray-500 mb-8">Veuillez lire et accepter le contrat pour continuer</p>
+
+        <Card className="mb-4">
+          <CardHeader title="Votre offre" icon={<Crown size={18} />} />
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm"><span className="text-gray-500">Offre</span><span className="font-semibold">{offer.duration} — Premium</span></div>
+            <div className="flex justify-between text-sm"><span className="text-gray-500">Montant</span><span className="font-semibold">{offer.current} $</span></div>
+            <div className="flex justify-between text-sm"><span className="text-gray-500">Frais de dossier</span><span className="font-semibold">50 $</span></div>
+            <div className="flex justify-between text-sm border-t border-gray-100 pt-2"><span className="font-bold">Total</span><span className="font-bold text-corpiq-blue">{offer.current + 50} $</span></div>
           </div>
         </Card>
 
-        <Button fullWidth size="lg" onClick={handlePayment} icon={<CreditCard size={16} />} className="shadow-lg hover:shadow-xl transition-shadow">
-          Procéder au paiement — {offer.current + 50} $
+        <Card className="mb-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-corpiq-blue-50 rounded-xl flex items-center justify-center">
+                <FileText size={18} className="text-corpiq-blue" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-900">Contrat CORPIQ — {offer.duration}</p>
+                <p className="text-xs text-gray-400">Document contractuel obligatoire</p>
+              </div>
+            </div>
+            <Badge variant="neutral">Obligatoire</Badge>
+          </div>
+
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 max-h-[280px] overflow-y-auto scrollbar-thin mb-5 text-xs text-gray-600 leading-relaxed space-y-3">
+            <p className="font-bold text-gray-800 text-sm">Contrat d'adhésion CORPIQ</p>
+
+            <div>
+              <p className="font-bold text-gray-800">Article 1 — Parties</p>
+              <p>Le présent contrat est conclu entre la Corporation des propriétaires immobiliers du Québec (CORPIQ) et le membre soussigné.</p>
+            </div>
+
+            <div>
+              <p className="font-bold text-gray-800">Article 2 — Durée et tarif</p>
+              <p>L'adhésion est consentie pour une durée de <strong>{offer.duration}</strong>, au tarif de <strong>{offer.current + 50} $</strong> (incluant les frais d'ouverture de dossier de 50 $).</p>
+            </div>
+
+            <div>
+              <p className="font-bold text-gray-800">Article 3 — Services inclus</p>
+              <ul className="list-disc ml-4 space-y-0.5">
+                {offer.services.map((s, i) => <li key={i}>{s}</li>)}
+                {offer.bonus && <li className="font-semibold text-violet-600">{offer.bonus}</li>}
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-bold text-gray-800">Article 4 — Renouvellement automatique</p>
+              <p>L'adhésion se renouvelle automatiquement à la date d'échéance. La carte de crédit fournie lors de l'adhésion sera utilisée pour les prélèvements futurs. Toute modification doit être communiquée au chargé de compte.</p>
+            </div>
+
+            <div>
+              <p className="font-bold text-gray-800">Article 5 — Carte de paiement</p>
+              <p>La carte de crédit utilisée pour le paiement initial sera <strong>enregistrée dans l'espace membre</strong> (section Profil → Facturation) et servira pour les renouvellements automatiques. Le membre peut mettre à jour sa carte à tout moment via son profil.</p>
+            </div>
+
+            <div>
+              <p className="font-bold text-gray-800">Article 6 — Résiliation</p>
+              <p>Le membre peut résilier en contactant son chargé de compte. Aucun remboursement pour la période restante. Au-delà de 90 jours après expiration, une réadhésion complète avec frais de dossier sera requise.</p>
+            </div>
+
+            <p className="text-gray-400 italic pt-2 border-t border-gray-200">Document contractuel — Version mars 2026</p>
+          </div>
+
+          <label className="flex items-start gap-3 cursor-pointer group p-4 bg-white rounded-xl border-2 border-gray-200 hover:border-corpiq-blue transition-colors">
+            <div className="relative mt-0.5">
+              <input type="checkbox" checked={contractAccepted} onChange={(e) => setContractAccepted(e.target.checked)} className="sr-only peer" />
+              <div className={clsx(
+                'w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center',
+                contractAccepted ? 'border-corpiq-blue bg-corpiq-blue' : 'border-gray-300'
+              )}>
+                {contractAccepted && <Check size={12} className="text-white" />}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-bold text-gray-900 group-hover:text-corpiq-blue transition-colors">
+                J'ai lu et j'accepte le contrat d'adhésion CORPIQ
+              </p>
+              <p className="text-xs text-gray-400 mt-0.5">Vous devez accepter le contrat pour procéder au paiement</p>
+            </div>
+          </label>
+        </Card>
+
+        <Button
+          fullWidth
+          size="lg"
+          onClick={() => contractAccepted && setStep('payment')}
+          icon={<ArrowRight size={16} />}
+          className={clsx('shadow-lg transition-all', contractAccepted ? 'hover:shadow-xl' : 'opacity-50 cursor-not-allowed')}
+        >
+          Continuer vers le paiement
         </Button>
       </div>
     );
@@ -197,14 +389,8 @@ function NonMemberView() {
         </button>
 
         <div className="text-center mb-10">
-          <div className="flex items-center gap-2 justify-center mb-4">
-            <div className="flex gap-1">
-              {[1, 2].map(s => (
-                <div key={s} className={clsx('h-1.5 rounded-full transition-all duration-500', s <= 2 ? 'w-8 bg-corpiq-blue' : 'w-4 bg-gray-200')} />
-              ))}
-              <div className="h-1.5 w-4 rounded-full bg-gray-200" />
-            </div>
-            <span className="text-xs text-gray-400 ml-2">Étape 2 / 3</span>
+          <div className="flex justify-center mb-4">
+            <StepIndicator current={2} total={4} />
           </div>
           <Badge variant="info" className="mb-3">{nbUnits} logement{nbUnits > 1 ? 's' : ''}</Badge>
           <h2 className="text-2xl font-bold text-gray-900 mt-3 mb-1.5 tracking-tight">Choisissez votre offre</h2>
@@ -256,7 +442,7 @@ function NonMemberView() {
               )}
 
               <button
-                onClick={(e) => { e.stopPropagation(); setSelectedOffer(offer.id); setStep('tunnel'); }}
+                onClick={(e) => { e.stopPropagation(); setSelectedOffer(offer.id); setStep('contract'); }}
                 className={clsx(
                   'w-full mt-5 py-3 rounded-xl text-sm font-bold transition-all duration-200',
                   offer.highlight || selectedOffer === offer.id
@@ -282,13 +468,8 @@ function NonMemberView() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 justify-center mb-6">
-        <div className="flex gap-1">
-          <div className="h-1.5 w-8 rounded-full bg-corpiq-blue" />
-          <div className="h-1.5 w-4 rounded-full bg-gray-200" />
-          <div className="h-1.5 w-4 rounded-full bg-gray-200" />
-        </div>
-        <span className="text-xs text-gray-400 ml-2">Étape 1 / 3</span>
+      <div className="flex justify-center mb-6">
+        <StepIndicator current={1} total={4} />
       </div>
 
       <h2 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">Adhérer à CORPIQ</h2>

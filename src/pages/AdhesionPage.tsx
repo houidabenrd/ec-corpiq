@@ -106,7 +106,12 @@ function NonMemberView() {
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCvc, setCardCvc] = useState('');
   const [cardName, setCardName] = useState('Jean Tremblay');
-  const [saveCard, setSaveCard] = useState(true);
+  const [billingAddress, setBillingAddress] = useState('');
+  const [billingCity, setBillingCity] = useState('');
+  const [billingPostal, setBillingPostal] = useState('');
+  const [billingProvince, setBillingProvince] = useState('QC');
+  const [authDebit, setAuthDebit] = useState(false);
+  const [authRenewal, setAuthRenewal] = useState(false);
   const { setPresetIndex } = useScenario();
   const navigate = useNavigate();
 
@@ -137,12 +142,23 @@ function NonMemberView() {
           <Row label="N° carte" value="4521-7890-1234" mono />
           <Row label="Offre" value={offers.find(o => o.id === selectedOffer)?.duration} />
         </div>
-        <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl mb-8 text-left">
-          <div className="flex items-start gap-3">
-            <CreditCard size={16} className="text-emerald-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs font-bold text-emerald-800">Carte enregistrée dans votre profil</p>
-              <p className="text-[11px] text-emerald-600 mt-0.5">Votre carte de paiement a été sauvegardée et sera utilisée pour les prochains renouvellements. Vous pouvez la gérer dans Profil → Facturation.</p>
+        <div className="space-y-3 mb-8">
+          <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-left">
+            <div className="flex items-start gap-3">
+              <CreditCard size={16} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-emerald-800">Carte enregistrée dans votre profil</p>
+                <p className="text-[11px] text-emerald-600 mt-0.5">Votre carte et adresse de facturation ont été sauvegardées. Gérez-les dans Profil → Facturation.</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl text-left">
+            <div className="flex items-start gap-3">
+              <MapPin size={16} className="text-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-blue-800">Adresse de facturation enregistrée</p>
+                <p className="text-[11px] text-blue-600 mt-0.5">L'adresse de facturation a été ajoutée à votre profil organisation.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -157,7 +173,10 @@ function NonMemberView() {
   // ── STEP 4: Payment ──
   if (step === 'payment') {
     const offer = offers.find(o => o.id === selectedOffer)!;
-    const cardValid = cardNumber.length >= 16 && cardExpiry.length >= 4 && cardCvc.length >= 3;
+    const total = offer.current + 50;
+    const cardFieldsValid = cardNumber.length >= 16 && cardExpiry.length >= 4 && cardCvc.length >= 3 && cardName.length > 0;
+    const addressValid = billingAddress.length > 0 && billingCity.length > 0 && billingPostal.length > 0;
+    const canPay = cardFieldsValid && addressValid && authDebit && authRenewal;
 
     return (
       <div className="max-w-lg mx-auto animate-fade-in">
@@ -167,24 +186,12 @@ function NonMemberView() {
 
         <StepIndicator current={4} total={4} />
         <h2 className="text-xl font-bold text-gray-900 mb-1">Paiement sécurisé</h2>
-        <p className="text-sm text-gray-500 mb-8">Offre {offer.duration} — Total : <span className="font-bold text-corpiq-blue">{offer.current + 50} $</span></p>
+        <p className="text-sm text-gray-500 mb-8">Offre {offer.duration} — Total : <span className="font-bold text-corpiq-blue">{total} $</span></p>
 
-        <Card className="mb-4 overflow-hidden">
-          <CardHeader title="Récapitulatif" icon={<Receipt size={18} />} />
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm"><span className="text-gray-500">Adhésion {offer.duration}</span><span className="font-semibold">{offer.current} $</span></div>
-            <div className="flex justify-between text-sm"><span className="text-gray-500">Frais d'ouverture de dossier</span><span className="font-semibold">50 $</span></div>
-            <div className="flex justify-between text-sm border-t border-gray-100 pt-3 mt-3">
-              <span className="font-bold text-gray-900">Total</span>
-              <span className="font-bold text-corpiq-blue text-xl">{offer.current + 50} $</span>
-            </div>
-          </div>
-        </Card>
-
+        {/* ── Card ── */}
         <Card className="mb-4">
           <CardHeader title="Carte de crédit" icon={<CreditCard size={18} />} />
 
-          {/* Simulated card preview */}
           <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800 via-gray-900 to-black p-5 text-white mb-5 shadow-lg">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
             <div className="relative z-10">
@@ -237,19 +244,82 @@ function NonMemberView() {
               />
             </div>
           </div>
+        </Card>
 
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <label className="flex items-start gap-3 cursor-pointer group">
-              <div className="relative mt-0.5">
-                <input type="checkbox" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} className="sr-only peer" />
-                <div className="w-5 h-5 rounded-md border-2 border-gray-300 peer-checked:border-corpiq-blue peer-checked:bg-corpiq-blue transition-all flex items-center justify-center">
-                  {saveCard && <Check size={12} className="text-white" />}
+        {/* ── Billing address ── */}
+        <Card className="mb-4">
+          <CardHeader title="Adresse de facturation" icon={<MapPin size={18} />} />
+          <p className="text-xs text-gray-400 -mt-4 mb-4">Cette adresse sera enregistrée dans votre profil organisation.</p>
+          <div className="space-y-3">
+            <Input
+              label="Adresse"
+              placeholder="123 rue Principale"
+              value={billingAddress}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBillingAddress(e.target.value)}
+              icon={<MapPin size={16} />}
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                label="Ville"
+                placeholder="Montréal"
+                value={billingCity}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBillingCity(e.target.value)}
+              />
+              <Input
+                label="Province"
+                value={billingProvince}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBillingProvince(e.target.value)}
+              />
+            </div>
+            <Input
+              label="Code postal"
+              placeholder="H2X 1L4"
+              value={billingPostal}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBillingPostal(e.target.value)}
+            />
+          </div>
+        </Card>
+
+        {/* ── Authorization ── */}
+        <Card className="mb-5">
+          <CardHeader title="Autorisation de paiement" icon={<ShieldCheck size={18} />} />
+
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 mb-5 text-xs text-gray-600 leading-relaxed space-y-2">
+            <p>En cochant les cases ci-dessous et en fournissant les informations de ma carte de crédit, j'autorise la CORPIQ à percevoir les montants dus dans le cadre de mon adhésion.</p>
+            <p className="font-semibold text-gray-700">Je reconnais que :</p>
+            <ul className="space-y-1.5 ml-1">
+              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>les informations de ma carte de crédit seront enregistrées dans mon espace membre ;</li>
+              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>mon adhésion peut être renouvelée automatiquement conformément au contrat d'adhésion ;</li>
+              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>la cotisation annuelle sera prélevée à la date anniversaire du renouvellement ;</li>
+              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>le montant de la cotisation peut être modifié lors du renouvellement conformément à la grille tarifaire en vigueur ;</li>
+              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>je dois maintenir des informations de paiement valides et à jour ;</li>
+              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>je peux modifier mes informations de paiement ou révoquer cette autorisation avant la prochaine date anniversaire.</li>
+            </ul>
+          </div>
+
+          <div className="space-y-3">
+            <label className="flex items-start gap-3 cursor-pointer group p-3 rounded-xl border-2 border-gray-200 hover:border-corpiq-blue/30 transition-all">
+              <div className="relative mt-0.5 flex-shrink-0">
+                <input type="checkbox" checked={authDebit} onChange={(e) => setAuthDebit(e.target.checked)} className="sr-only" />
+                <div className={clsx('w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center', authDebit ? 'border-corpiq-blue bg-corpiq-blue' : 'border-gray-300')}>
+                  {authDebit && <Check size={12} className="text-white" />}
                 </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">Enregistrer cette carte dans mon profil</p>
-                <p className="text-xs text-gray-400 mt-0.5">Sera utilisée pour les prochains renouvellements automatiques</p>
+              <p className="text-xs text-gray-700 leading-relaxed">
+                J'autorise la CORPIQ à enregistrer les informations bancaires fournies dans mon espace membre et à débiter en date d'aujourd'hui ma carte de crédit pour un montant de <strong className="text-corpiq-blue">{total} $</strong> (taxes incluses), correspondant aux frais de cotisation et aux frais d'ouverture de dossier.
+              </p>
+            </label>
+
+            <label className="flex items-start gap-3 cursor-pointer group p-3 rounded-xl border-2 border-gray-200 hover:border-corpiq-blue/30 transition-all">
+              <div className="relative mt-0.5 flex-shrink-0">
+                <input type="checkbox" checked={authRenewal} onChange={(e) => setAuthRenewal(e.target.checked)} className="sr-only" />
+                <div className={clsx('w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center', authRenewal ? 'border-corpiq-blue bg-corpiq-blue' : 'border-gray-300')}>
+                  {authRenewal && <Check size={12} className="text-white" />}
+                </div>
               </div>
+              <p className="text-xs text-gray-700 leading-relaxed">
+                J'autorise la CORPIQ à débiter automatiquement ma carte de crédit à chaque date anniversaire du renouvellement pour le paiement de la cotisation annuelle applicable, incluant les taxes, conformément au contrat d'adhésion.
+              </p>
             </label>
           </div>
         </Card>
@@ -262,12 +332,20 @@ function NonMemberView() {
         <Button
           fullWidth
           size="lg"
-          onClick={handlePayment}
+          onClick={() => canPay && handlePayment()}
           icon={<CreditCard size={16} />}
-          className={clsx('shadow-lg transition-all', cardValid ? 'hover:shadow-xl' : 'opacity-60 cursor-not-allowed')}
+          className={clsx('shadow-lg transition-all', canPay ? 'hover:shadow-xl' : 'opacity-50 cursor-not-allowed')}
         >
-          Payer {offer.current + 50} $ et adhérer
+          Payer {total} $ et adhérer
         </Button>
+
+        {!canPay && (
+          <p className="text-[11px] text-center text-gray-400 mt-2">
+            {!cardFieldsValid && 'Veuillez remplir les informations de carte. '}
+            {!addressValid && 'Veuillez saisir l\'adresse de facturation. '}
+            {(!authDebit || !authRenewal) && 'Les deux autorisations sont obligatoires.'}
+          </p>
+        )}
       </div>
     );
   }

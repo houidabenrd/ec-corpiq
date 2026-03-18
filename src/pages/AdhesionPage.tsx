@@ -289,11 +289,12 @@ function NonMemberView() {
             <p className="font-semibold text-gray-700">Je reconnais que :</p>
             <ul className="space-y-1.5 ml-1">
               <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>les informations de ma carte de crédit seront enregistrées dans mon espace membre ;</li>
-              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>mon adhésion peut être renouvelée automatiquement conformément au contrat d'adhésion ;</li>
-              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>la cotisation annuelle sera prélevée à la date anniversaire du renouvellement ;</li>
-              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>le montant de la cotisation peut être modifié lors du renouvellement conformément à la grille tarifaire en vigueur ;</li>
+              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>mon adhésion sera renouvelée automatiquement <strong>pour une durée indéterminée</strong> à l'expiration de la période initiale, conformément au contrat d'adhésion ;</li>
+              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>la cotisation annuelle sera prélevée à la date anniversaire du renouvellement, conformément au tarif en vigueur ;</li>
+              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>le montant de la cotisation peut être ajusté, avec un préavis écrit d'au moins 30 jours avant la date de prélèvement ;</li>
+              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>la CORPIQ me transmettra un avis écrit entre le 90<sup>e</sup> et le 60<sup>e</sup> jour avant l'expiration initiale, puis au moins 1 mois avant chaque date anniversaire ;</li>
               <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>je dois maintenir des informations de paiement valides et à jour ;</li>
-              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>je peux modifier mes informations de paiement ou révoquer cette autorisation avant la prochaine date anniversaire.</li>
+              <li className="flex items-start gap-2"><span className="text-corpiq-blue mt-0.5">•</span>je peux modifier mes informations de paiement ou révoquer cette autorisation avant la prochaine date anniversaire du renouvellement.</li>
             </ul>
           </div>
 
@@ -318,7 +319,7 @@ function NonMemberView() {
                 </div>
               </div>
               <p className="text-xs text-gray-700 leading-relaxed">
-                J'autorise la CORPIQ à débiter automatiquement ma carte de crédit à chaque date anniversaire du renouvellement pour le paiement de la cotisation annuelle applicable, incluant les taxes, conformément au contrat d'adhésion.
+                J'autorise la CORPIQ à débiter automatiquement ma carte de crédit à chaque date anniversaire du renouvellement, <strong>pour une durée indéterminée</strong>, pour le paiement de la cotisation annuelle applicable incluant les taxes. Je serai informé(e) par avis écrit au moins 1 mois avant chaque prélèvement du montant applicable. Je pourrai résilier conformément aux modalités prévues au contrat.
               </p>
             </label>
           </div>
@@ -397,8 +398,8 @@ function NonMemberView() {
             </div>
 
             <div>
-              <p className="font-bold text-gray-800">Article 2 — Durée et tarif</p>
-              <p>L'adhésion est consentie pour une durée de <strong>{offer.duration}</strong>, au tarif de <strong>{offer.current + 50} $</strong> (incluant les frais d'ouverture de dossier de 50 $).</p>
+              <p className="font-bold text-gray-800">Article 2 — Durée initiale et tarif</p>
+              <p>L'adhésion est consentie pour une période initiale de <strong>{offer.duration}</strong>, au tarif de <strong>{offer.current + 50} $</strong> (incluant les frais d'ouverture de dossier de 50 $). Les durées d'adhésion initiales offertes sont de 1, 2 ou 3 ans.</p>
             </div>
 
             <div>
@@ -411,17 +412,26 @@ function NonMemberView() {
 
             <div>
               <p className="font-bold text-gray-800">Article 4 — Renouvellement automatique</p>
-              <p>L'adhésion se renouvelle automatiquement à la date d'échéance. La carte de crédit fournie lors de l'adhésion sera utilisée pour les prélèvements futurs. Toute modification doit être communiquée au chargé de compte.</p>
+              <p className="mb-2">Entre le 90<sup>e</sup> et le 60<sup>e</sup> jour précédant l'expiration de la période initiale d'adhésion, la CORPIQ transmettra au Membre un avis écrit l'informant notamment de la date d'expiration de son adhésion initiale, des conditions de renouvellement ainsi que du montant de la cotisation applicable au renouvellement.</p>
+              <p className="mb-2">Le défaut de réception de cet avis par le Membre, pour toute raison hors du contrôle de la CORPIQ, n'a pas pour effet d'invalider automatiquement le renouvellement de l'adhésion, sous réserve des dispositions de la loi applicable.</p>
+              <p className="mb-2">À défaut pour le Membre d'aviser la CORPIQ par écrit, après la réception de l'avis mentionné ci-haut, de son intention de ne pas renouveler son adhésion avant la date d'échéance de la période initiale, <strong>l'adhésion sera renouvelée automatiquement pour une durée indéterminée</strong>.</p>
+              <p className="mb-2">À compter du renouvellement à durée indéterminée, la cotisation applicable sera facturée annuellement à la date anniversaire du renouvellement, conformément au tarif en vigueur et aux modalités prévues au contrat.</p>
+              <p>La CORPIQ transmettra au Membre un avis écrit <strong>au moins un (1) mois</strong> avant la date anniversaire du renouvellement afin de l'informer notamment du montant de la cotisation applicable pour la prochaine année de facturation, la date du prélèvement et toute autre information pertinente.</p>
             </div>
 
             <div>
               <p className="font-bold text-gray-800">Article 5 — Carte de paiement</p>
-              <p>La carte de crédit utilisée pour le paiement initial sera <strong>enregistrée dans l'espace membre</strong> (section Profil → Facturation) et servira pour les renouvellements automatiques. Le membre peut mettre à jour sa carte à tout moment via son profil.</p>
+              <p>La carte de crédit utilisée pour le paiement initial sera <strong>enregistrée dans l'espace membre</strong> (section Profil → Facturation) et servira pour les prélèvements de renouvellement. Le Membre doit maintenir des informations de paiement valides et à jour. Il peut modifier ses informations de paiement à tout moment via son profil.</p>
             </div>
 
             <div>
-              <p className="font-bold text-gray-800">Article 6 — Résiliation</p>
-              <p>Le membre peut résilier en contactant son chargé de compte. Aucun remboursement pour la période restante. Au-delà de 90 jours après expiration, une réadhésion complète avec frais de dossier sera requise.</p>
+              <p className="font-bold text-gray-800">Article 6 — Frais de cotisation</p>
+              <p>Le montant de la cotisation peut être modifié lors du renouvellement conformément à la grille tarifaire en vigueur. Le Membre sera informé par avis écrit de tout ajustement tarifaire au moins 30 jours avant la date de prélèvement.</p>
+            </div>
+
+            <div>
+              <p className="font-bold text-gray-800">Article 7 — Résiliation</p>
+              <p>Le Membre peut résilier son adhésion conformément aux modalités prévues au contrat, en avisant la CORPIQ par écrit avant la prochaine date anniversaire du renouvellement. Aucun remboursement pour la période restante. Au-delà de 90 jours après expiration, une réadhésion complète avec frais de dossier sera requise.</p>
             </div>
 
             <p className="text-gray-400 italic pt-2 border-t border-gray-200">Document contractuel — Version mars 2026</p>
@@ -471,8 +481,8 @@ function NonMemberView() {
             <StepIndicator current={2} total={4} />
           </div>
           <Badge variant="info" className="mb-3">{nbUnits} logement{nbUnits > 1 ? 's' : ''}</Badge>
-          <h2 className="text-2xl font-bold text-gray-900 mt-3 mb-1.5 tracking-tight">Choisissez votre offre</h2>
-          <p className="text-sm text-gray-500">Tarifs adaptés à votre volume de logements</p>
+          <h2 className="text-2xl font-bold text-gray-900 mt-3 mb-1.5 tracking-tight">Choisissez votre durée initiale</h2>
+          <p className="text-sm text-gray-500">Période initiale de 1, 2 ou 3 ans — renouvelée automatiquement à durée indéterminée</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -532,6 +542,14 @@ function NonMemberView() {
               </button>
             </div>
           ))}
+        </div>
+
+        <div className="mt-8 p-4 bg-blue-50/60 border border-blue-100 rounded-xl flex items-start gap-3">
+          <Info size={16} className="text-blue-500 mt-0.5 flex-shrink-0" />
+          <div className="text-xs text-blue-700 leading-relaxed space-y-1">
+            <p className="font-semibold text-blue-800">Renouvellement à durée indéterminée</p>
+            <p>À l'expiration de la période initiale choisie, votre adhésion sera automatiquement renouvelée pour une <strong>durée indéterminée</strong>. La cotisation sera facturée annuellement à la date anniversaire. Un avis écrit vous sera transmis entre le 90<sup>e</sup> et le 60<sup>e</sup> jour avant l'expiration initiale, puis au moins 1 mois avant chaque date anniversaire, avec le montant applicable et la date de prélèvement.</p>
+          </div>
         </div>
       </div>
     );
@@ -702,8 +720,9 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
       <div className={clsx('grid grid-cols-1 gap-6', isOwner && 'md:grid-cols-2')}>
         {/* ── Renouvellement auto ── */}
         <Card className="group hover:shadow-card-hover transition-shadow duration-300">
-          <CardHeader title="Renouvellement automatique" icon={<RefreshCw size={18} />} badge={<Badge variant="success" dot>Actif</Badge>} />
+          <CardHeader title="Renouvellement automatique" icon={<RefreshCw size={18} />} badge={<Badge variant="success" dot>Durée indéterminée</Badge>} />
           <div className="space-y-1 mb-4">
+            <Row label="Type" value={<span className="text-corpiq-blue font-bold">Durée indéterminée</span>} />
             <Row label="Renouvellement auto" value={
               <div className="flex items-center gap-2">
                 <span className="text-emerald-600 font-semibold text-xs">Activé</span>
@@ -712,14 +731,22 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
                 </div>
               </div>
             } />
-            <Row label="Date de renouvellement" value={<span className="text-corpiq-blue font-bold">15 mars 2028</span>} />
+            <Row label="Date anniversaire" value={<span className="text-corpiq-blue font-bold">15 mars 2028</span>} />
             <Row label="Prochain prélèvement" value={isRenewal ? '1er avril 2026' : '15 mars 2028'} />
+            <Row label="Préavis d'ajustement" value="30 à 60 jours avant la date anniversaire" />
+          </div>
+          <div className="p-3.5 bg-blue-50/80 border border-blue-100 rounded-xl flex items-start gap-2.5 mb-3">
+            <Info size={14} className="text-blue-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-xs font-semibold text-blue-800">Renouvellement à durée indéterminée</p>
+              <p className="text-[11px] text-blue-600 mt-0.5 leading-relaxed">Votre adhésion est renouvelée automatiquement chaque année à la date anniversaire. La CORPIQ vous informera par avis écrit au moins 1 mois avant la date de prélèvement du montant de la cotisation applicable et de toute modification tarifaire.</p>
+            </div>
           </div>
           <div className="p-3.5 bg-amber-50/80 border border-amber-100 rounded-xl flex items-start gap-2.5 mb-3">
             <Info size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-xs font-semibold text-amber-800">Lecture seule</p>
-              <p className="text-[11px] text-amber-600 mt-0.5 leading-relaxed">Contactez votre chargé de compte CORPIQ pour modifier le renouvellement automatique.</p>
+              <p className="text-xs font-semibold text-amber-800">Résiliation</p>
+              <p className="text-[11px] text-amber-600 mt-0.5 leading-relaxed">Pour ne pas renouveler, avisez la CORPIQ par écrit avant la prochaine date anniversaire. Contactez votre chargé de compte pour toute demande.</p>
             </div>
           </div>
           <Button variant="outline" size="sm" fullWidth icon={<Headphones size={14} />} onClick={() => setContactModalOpen(true)}>
@@ -923,8 +950,8 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
               </div>
 
               <div>
-                <p className="font-bold text-gray-800 mb-1">Article 2 — Durée et tarif</p>
-                <p>L'adhésion est consentie pour une durée de <strong>2 ans</strong>, soit du <strong>15 mars 2026</strong> au <strong>15 mars 2028</strong>, au tarif de <strong>545 $</strong> (incluant les frais d'ouverture de dossier de 50 $).</p>
+                <p className="font-bold text-gray-800 mb-1">Article 2 — Durée initiale et tarif</p>
+                <p>L'adhésion est consentie pour une période initiale de <strong>2 ans</strong>, soit du <strong>15 mars 2026</strong> au <strong>15 mars 2028</strong>, au tarif de <strong>545 $</strong> (incluant les frais d'ouverture de dossier de 50 $). Les durées d'adhésion initiales offertes sont de 1, 2 ou 3 ans.</p>
               </div>
 
               <div>
@@ -939,13 +966,22 @@ function MemberView({ isRenewal }: { isRenewal?: boolean }) {
               </div>
 
               <div>
-                <p className="font-bold text-gray-800 mb-1">Article 4 — Renouvellement</p>
-                <p>L'adhésion se renouvelle automatiquement à la date d'échéance, sauf avis contraire communiqué au chargé de compte au moins 30 jours avant la date de fin.</p>
+                <p className="font-bold text-gray-800 mb-1">Article 4 — Renouvellement automatique</p>
+                <p className="mb-1.5">Entre le 90<sup>e</sup> et le 60<sup>e</sup> jour précédant l'expiration de la période initiale, la CORPIQ transmet au Membre un avis écrit l'informant de la date d'expiration, des conditions de renouvellement et du montant de la cotisation applicable.</p>
+                <p className="mb-1.5">Le défaut de réception de cet avis, pour toute raison hors du contrôle de la CORPIQ, n'invalide pas automatiquement le renouvellement, sous réserve de la loi applicable.</p>
+                <p className="mb-1.5">À défaut pour le Membre d'aviser la CORPIQ par écrit de son intention de ne pas renouveler avant la date d'échéance, <strong>l'adhésion sera renouvelée automatiquement pour une durée indéterminée</strong>.</p>
+                <p className="mb-1.5">La cotisation sera alors facturée annuellement à la date anniversaire du renouvellement, conformément au tarif en vigueur.</p>
+                <p>La CORPIQ transmettra un avis écrit <strong>au moins 1 mois</strong> avant la date anniversaire, informant le Membre du montant applicable et de la date de prélèvement.</p>
               </div>
 
               <div>
-                <p className="font-bold text-gray-800 mb-1">Article 5 — Résiliation</p>
-                <p>Le membre peut résilier son adhésion en contactant son chargé de compte. Aucun remboursement n'est accordé pour la période restante. En cas de non-renouvellement au-delà de 90 jours après expiration, une réadhésion complète avec frais de dossier sera requise.</p>
+                <p className="font-bold text-gray-800 mb-1">Article 5 — Frais de cotisation</p>
+                <p>Le montant de la cotisation peut être modifié lors du renouvellement conformément à la grille tarifaire en vigueur. Le Membre sera informé par avis écrit de tout ajustement tarifaire au moins 30 jours avant la date de prélèvement.</p>
+              </div>
+
+              <div>
+                <p className="font-bold text-gray-800 mb-1">Article 6 — Résiliation</p>
+                <p>Le Membre peut résilier son adhésion en avisant la CORPIQ par écrit avant la prochaine date anniversaire du renouvellement. Aucun remboursement n'est accordé pour la période restante. Au-delà de 90 jours après expiration, une réadhésion complète avec frais de dossier sera requise.</p>
               </div>
 
               <div className="pt-3 border-t border-gray-200">
